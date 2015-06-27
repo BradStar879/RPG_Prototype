@@ -53,7 +53,7 @@ public class MenuState extends GameState{
 		}
 		else if(k == KeyEvent.VK_ENTER){
 			if(currentSelection == 0){
-				gsm.states.push(new World(gsm));
+				gsm.states.push(new ClassSelection(gsm));
 			}
 			else if(currentSelection == 1){
 				gsm.states.push(new Help(gsm));

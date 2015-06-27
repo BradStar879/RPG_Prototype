@@ -4,7 +4,10 @@ import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 
@@ -34,8 +37,8 @@ public class Help extends GameState{
 		g.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
 		ImageIcon help = new ImageIcon("src/pics/help.jpg");
 		Image image = help.getImage();
+		//Image imageSzed = image.getScaledInstance(100, 100, Image.SCALE_DEFAULT);
 		g.drawImage(image, GamePanel.WIDTH / 4, GamePanel.HEIGHT / 10, null);
-		
 		
 	}
 

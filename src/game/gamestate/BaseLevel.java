@@ -37,6 +37,7 @@ public class BaseLevel extends GameState{
 	int infoHt;
 	int menuWd;
 	int menuHt;
+	int battleEnd = 180;
 	boolean won;
 	boolean lost;
 	static boolean paused;
@@ -173,6 +174,12 @@ public class BaseLevel extends GameState{
 					attackQueue.peek().attackMode();
 				}
 				else dequeueTurn();
+			}
+		}
+		if(won) {
+			battleEnd--;
+			if(battleEnd == 0) {
+				gsm.states.remove(this);
 			}
 		}
 	}

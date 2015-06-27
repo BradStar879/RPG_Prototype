@@ -70,11 +70,11 @@ public class ClassSelection extends GameState{
 			selected++;
 			if(selected == 3) {
 				BaseLevel.classes = classesSelected;
-				gsm.states.push(new BaseLevel(gsm));
+				gsm.states.push(new World(gsm));
 			}
 		}
 		if(k == KeyEvent.VK_ESCAPE) {
-			gsm.states.push(new MenuState(gsm));
+			gsm.states.remove(this);
 		}
 		
 	}
