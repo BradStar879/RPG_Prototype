@@ -35,6 +35,7 @@ public class MenuState extends GameState{
 			}
 			g.drawString(options[i], GamePanel.WIDTH / 2 - GamePanel.HEIGHT / 7, GamePanel.HEIGHT / 5 + i * GamePanel.HEIGHT / 5);
 		}
+		
 	}
 
 	public void keyPressed(int k) {
@@ -52,7 +53,7 @@ public class MenuState extends GameState{
 		}
 		else if(k == KeyEvent.VK_ENTER){
 			if(currentSelection == 0){
-				gsm.states.push(new ClassSelection(gsm));
+				gsm.states.push(new World(gsm));
 			}
 			else if(currentSelection == 1){
 				gsm.states.push(new Help(gsm));

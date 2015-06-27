@@ -25,8 +25,8 @@ import display.QueueDisplay;
 
 
 public class BaseLevel extends GameState{
-	static short charSelect = 0;
-	static short menuSelect = 0;
+	static short charSelect;
+	static short menuSelect;
 	int ht;
 	int wd;
 	int border;
@@ -45,17 +45,19 @@ public class BaseLevel extends GameState{
 	static String[] menuOptions;
 	static boolean[] onCooldown;
 	boolean turnActive ;
-	static Queue<BaseCharacter> attackQueue = new LinkedList();
+	public static Queue<BaseCharacter> attackQueue;
 	
 	static boolean[] mobInLane;
 	static boolean[] posFilled;
 	static BaseMob[] mob;
 	
+	public static String[] classes;
+	
 	public CoordinateTester test;
 	public static BaseCharacter char1;
 	public static BaseCharacter char2;
 	public static BaseCharacter char3;
-	public BaseCharacter[] chars;
+	public static BaseCharacter[] chars;
 	public BaseMob mob1;
 	public BaseMob mob2;
 	public BaseMob mob3;
@@ -87,6 +89,8 @@ public class BaseLevel extends GameState{
 		lost = false;
 		exit = false;
 		paused = false;
+		charSelect = 0;
+		menuSelect = 0;
 		
 		
 		mobInLane = new boolean[3];
@@ -97,9 +101,28 @@ public class BaseLevel extends GameState{
 		for(int i = 3; i < 6; i++) posFilled[i] = true;
 		
 		test = new CoordinateTester(400, 400);
-		char1 = new Warrior(0, 3, Color.RED, "Barbarian", 14, 625, 1000, 4, 15, 100, 50, 1);
-		char2 = new Spearman(1, 4, Color.CYAN, "Mage", 17, 200 , 900, 50, 60, 40, 100, 3);
-		char3 = new Monk(2, 5, Color.MAGENTA, "Archer", 12, 850, 900, 0, 10, 80, 15, 3);
+		
+		if(classes[0].equals("Warrior")) char1 = new Warrior(0, 3, Color.RED, "Barbarian", 14, 625, 1000, 4, 15, 100, 50, 1);
+		else if(classes[0].equals("Black Mage")) char1 = new BlackMage(0, 3, Color.RED, "Barbarian", 14, 625, 1000, 4, 15, 100, 50, 1);
+		else if(classes[0].equals("White Mage")) char1 = new WhiteMage(0, 3, Color.RED, "Barbarian", 14, 625, 1000, 4, 15, 100, 50, 1);
+		else if(classes[0].equals("Archer")) char1 = new Archer(0, 3, Color.RED, "Barbarian", 14, 625, 1000, 4, 15, 100, 50, 1);
+		else if(classes[0].equals("Spearman")) char1 = new Spearman(0, 3, Color.RED, "Barbarian", 14, 625, 1000, 4, 15, 100, 50, 1);
+		else if(classes[0].equals("Monk")) char1 = new Monk(0, 3, Color.RED, "Barbarian", 14, 625, 1000, 4, 15, 100, 50, 1); 
+			
+		if(classes[1].equals("Warrior")) char2 = new Warrior(1, 4, Color.CYAN, "Mage", 17, 200 , 900, 50, 60, 40, 100, 3);
+		else if(classes[1].equals("Black Mage")) char2 = new BlackMage(1, 4, Color.CYAN, "Mage", 17, 200 , 900, 50, 60, 40, 100, 3);
+		else if(classes[1].equals("White Mage")) char2 = new WhiteMage(1, 4, Color.CYAN, "Mage", 17, 200 , 900, 50, 60, 40, 100, 3);
+		else if(classes[1].equals("Archer")) char2 = new Archer(1, 4, Color.CYAN, "Mage", 17, 200 , 900, 50, 60, 40, 100, 3);
+		else if(classes[1].equals("Spearman")) char2 = new Spearman(1, 4, Color.CYAN, "Mage", 17, 200 , 900, 50, 60, 40, 100, 3);
+		else if(classes[1].equals("Monk")) char2 = new Monk(1, 4, Color.CYAN, "Mage", 17, 200 , 900, 50, 60, 40, 100, 3);
+		
+		if(classes[2].equals("Warrior")) char3 = new Warrior(2, 5, Color.MAGENTA, "Archer", 12, 850, 900, 0, 10, 80, 15, 3);
+		else if(classes[2].equals("Black Mage")) char3 = new BlackMage(2, 5, Color.MAGENTA, "Archer", 12, 850, 900, 0, 10, 80, 15, 3);
+		else if(classes[2].equals("White Mage")) char3 = new WhiteMage(2, 5, Color.MAGENTA, "Archer", 12, 850, 900, 0, 10, 80, 15, 3);
+		else if(classes[2].equals("Archer")) char3 = new Archer(2, 5, Color.MAGENTA, "Archer", 12, 850, 900, 0, 10, 80, 15, 3);
+		else if(classes[2].equals("Spearman")) char3 = new Spearman(2, 5, Color.MAGENTA, "Archer", 12, 850, 900, 0, 10, 80, 15, 3);
+		else if(classes[2].equals("Monk")) char3 = new Monk(2, 5, Color.MAGENTA, "Archer", 12, 850, 900, 0, 10, 80, 15, 3);
+		
 		chars = new BaseCharacter[]{char1, char2, char3};
 		mob1 = new BaseMob(0, 100, 10, 120, 10);
 		mob2 = new BaseMob(1, 100, 10, 120, 8);
@@ -125,6 +148,7 @@ public class BaseLevel extends GameState{
 		turnActive = false;
 		menuOptions = new String[]{"", "", "", ""};
 		onCooldown = new boolean[]{false, false, false, false};
+		attackQueue = new LinkedList();
 	}
 
 	
@@ -232,20 +256,10 @@ public class BaseLevel extends GameState{
 		}
 		if(!won && !lost && !paused) {
 			if(k == KeyEvent.VK_E) {
-				if(charSelect == 2) charSelect = 0;
-				else charSelect++;
-				while(!chars[charSelect].getAlive()) {
-					if(charSelect == 2) charSelect = 0;
-					else charSelect++;
-				}
+				charSelectForward();
 			}
 			if(k == KeyEvent.VK_Q) {
-				if(charSelect == 0) charSelect = 2;
-				else charSelect--;
-				while(!chars[charSelect].getAlive()) {
-					if(charSelect == 0) charSelect = 2;
-					else charSelect--;
-				}
+				charSelectBack();
 			}
 		
 			char1.keyPressed(k);
@@ -274,6 +288,20 @@ public class BaseLevel extends GameState{
 		else if(char2.getPos() == pos) return char2;
 		else if(char3.getPos() == pos) return char3;
 		else return null;
+	}
+	
+	public static void charSelectForward() {
+		if(charSelect == 2) charSelect = 0;
+		else charSelect++;
+	}
+	
+	public static void charSelectBack() {
+		if(charSelect == 0) charSelect = 2;
+		else charSelect--;
+		while(!chars[charSelect].getAlive()) {
+			if(charSelect == 0) charSelect = 2;
+			else charSelect--;
+		}
 	}
 	
 	public static int getCharSelected() {

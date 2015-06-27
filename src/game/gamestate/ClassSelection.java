@@ -12,6 +12,9 @@ public class ClassSelection extends GameState{
 	int ht;
 	int wd;
 	int classSelect;
+	int selected;
+	String[] classes;
+	String[] classesSelected;
 
 	public ClassSelection(GameStateManager gsm) {
 		super(gsm);
@@ -22,6 +25,9 @@ public class ClassSelection extends GameState{
 		ht = GamePanel.HEIGHT;
 		wd = GamePanel.WIDTH;
 		classSelect = 0;
+		selected = 0;
+		classes = new String[]{"Warrior", "Black Mage", "White Mage", "Archer", "Spearman", "Monk"};
+		classesSelected = new String[]{"", "", ""};
 		
 	}
 
@@ -60,7 +66,12 @@ public class ClassSelection extends GameState{
 			else classSelect--;
 		}	
 		if(k == KeyEvent.VK_ENTER) {
-			gsm.states.push(new BaseLevel(gsm));
+			classesSelected[selected] = classes[classSelect];
+			selected++;
+			if(selected == 3) {
+				BaseLevel.classes = classesSelected;
+				gsm.states.push(new BaseLevel(gsm));
+			}
 		}
 		if(k == KeyEvent.VK_ESCAPE) {
 			gsm.states.push(new MenuState(gsm));

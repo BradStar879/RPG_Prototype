@@ -90,9 +90,19 @@ public class BaseCharacter {
 	}
 	
 	public void tick() {
+		
+		if(hp <= 0) {
+			alive = false;
+		}
+		else alive = true;
+		
 		if(alive) {
-			if(num == BaseLevel.getCharSelected()) selected = true;
-			else selected = false;
+			if(num == BaseLevel.getCharSelected()) {
+				selected = true;
+			}
+			else {
+				selected = false;
+			}
 		
 			if(time < timeMax) time += speed;
 			if(time >= timeMax && !queued) {
@@ -102,8 +112,11 @@ public class BaseCharacter {
 			}
 			lane = pos % 3;
 			distance = pos / 3;
-			if(hp <= 0) {
-				die();
+		}
+		else {
+			if(num == BaseLevel.getCharSelected()) {
+				selected = false;
+				BaseLevel.charSelectForward();
 			}
 		}
 
@@ -319,10 +332,6 @@ public class BaseCharacter {
 	
 	public boolean getAlive() {
 		return alive;
-	}
-	
-	public void die() {
-		alive = false;
 	}
 	
 	public String[] getMovesOnCooldown() {
