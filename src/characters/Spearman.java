@@ -12,7 +12,7 @@ public class Spearman extends BaseCharacter{
 	public Spearman(int num, int pos, Color col, String name, int level,
 			int hp, int maxHp, int mp, int maxMp, int speed, int attack,
 			int range) {
-		super(num, pos, col, "Spearman", level, hp, maxHp, mp, maxMp, speed, attack, 2);
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, 2);
 	}
 	
 	public void init() {

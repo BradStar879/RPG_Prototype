@@ -1,13 +1,13 @@
-package inventory;
+package player;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class BattleItems {
+public class Inventory {
 	
 	Map<String, Integer> itemList = new HashMap();
 	
-	public BattleItems() {
+	public Inventory() {
 		
 	}
 	

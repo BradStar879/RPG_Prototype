@@ -12,7 +12,7 @@ public class WhiteMage extends BaseCharacter {
 	public WhiteMage(int num, int pos, Color col, String name, int level,
 			int hp, int maxHp, int mp, int maxMp, int speed, int attack,
 			int range) {
-		super(num, pos, col, "White Mage", level, hp, maxHp, mp, maxMp, speed, attack, 3);
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, 3);
 	}
 	
 	public void init() {

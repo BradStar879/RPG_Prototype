@@ -40,7 +40,7 @@ public class BaseMob {
 		wd = GamePanel.HEIGHT / 36;
 		ht = GamePanel.HEIGHT / 18;
 		time = (int)(Math.random() * 201 + 0);
-		timeMax = 10000;
+		timeMax = 5000;
 		x = BaseLevel.getGridX(1) - (wd / 2) + ((BaseLevel.getGridX(2) - BaseLevel.getGridX(1)) * (lane + 1) / (4));
 		y = BaseLevel.getGridY(1) - ht * 2;
 	}

@@ -1,6 +1,6 @@
 package display;
 
-import game.gamestate.MenuState;
+
 import game.gamestate.BaseLevel;
 import game.main.GamePanel;
 
@@ -22,7 +22,7 @@ public class PauseDisplay {
 	int pauseSelect = 0;
 	
 	
-	public PauseDisplay(){}
+	public PauseDisplay() {}
 	
 	public void draw(Graphics g) {
 		

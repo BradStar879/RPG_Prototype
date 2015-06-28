@@ -52,7 +52,7 @@ public class InfoDisplay {
 		g.setColor(Color.WHITE);
 		g.drawString("MP: " + c.getMp() + " / " + c.getMaxMp(), 2 * border, infoHt / 2 + 6 * border + (factor * (infoHt + 2 * border)));
 		g.setColor(Color.MAGENTA);
-		g.fillRect(3 * border, infoHt / 2 + 6 * border + (border / 3) + (factor * (infoHt + 2 * border)), (infoWd * 3 / 4) * c.getMp() / c.getMaxMp(), border);
+		if(c.getMaxMp() > 0) g.fillRect(3 * border, infoHt / 2 + 6 * border + (border / 3) + (factor * (infoHt + 2 * border)), (infoWd * 3 / 4) * c.getMp() / c.getMaxMp(), border);
 		g.setColor(Color.BLACK);
 		g.drawRect(3 * border, infoHt / 2 + 6 * border + (border / 3) + (factor * (infoHt + 2 * border)), infoWd * 3 / 4, border);
 				

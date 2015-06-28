@@ -7,6 +7,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 
+import player.CharacterStats;
+
 public class ClassSelection extends GameState{
 	
 	int ht;
@@ -15,6 +17,11 @@ public class ClassSelection extends GameState{
 	int selected;
 	String[] classes;
 	String[] classesSelected;
+	CharacterStats[] team;
+	
+	CharacterStats char1;
+	CharacterStats char2;
+	CharacterStats char3;
 
 	public ClassSelection(GameStateManager gsm) {
 		super(gsm);
@@ -69,7 +76,11 @@ public class ClassSelection extends GameState{
 			classesSelected[selected] = classes[classSelect];
 			selected++;
 			if(selected == 3) {
-				BaseLevel.classes = classesSelected;
+				char1 = new CharacterStats("Tom", classesSelected[0]);
+				char2 = new CharacterStats("Bob", classesSelected[1]);
+				char3 = new CharacterStats("Alfred", classesSelected[2]);
+				team = new CharacterStats[]{char1, char2, char3};
+				BaseLevel.team = team;
 				gsm.states.push(new World(gsm));
 			}
 		}
