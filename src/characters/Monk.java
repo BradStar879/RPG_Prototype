@@ -11,12 +11,14 @@ public class Monk extends BaseCharacter{
 	int attackBoost;
 
 	public Monk(int num, int pos, Color col, String name, int level, int hp,
-			int maxHp, int mp, int maxMp, int speed, int attack, int range) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, 1);
+			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack) {
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack);
 	}
 	
 	public void init() {
 		super.init();
+		className = "Monk";
+		range = 1;
 		moveSet[0] =  "Attack";
 		moveSet[1] = "Meditate";
 		moveSet[2] = "";

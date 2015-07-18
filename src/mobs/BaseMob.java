@@ -23,6 +23,8 @@ public class BaseMob {
 	int x;
 	int y;
 	int attackPos;
+	String weak;;
+	String resist;
 	boolean attacking = false;
 	boolean alive = true;
 	
@@ -46,7 +48,7 @@ public class BaseMob {
 	}
 	
 	public void tick() {
-		if(hp <= 0) alive = false;
+		
 		if(alive) {
 			if(time < timeMax) time += speed;
 			else {
@@ -91,7 +93,21 @@ public class BaseMob {
 	
 	public boolean takeDamage(int damage) {
 		hp -= damage;
-		if(hp <= 0) return true;
+		if(hp <= 0) {
+			alive = false;
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean takeDamage(int damage, String elem) {
+		if(elem.equals(weak)) hp -= damage * 1.2;
+		else if(elem.equals(resist)) hp -= damage * 1.2;
+		else hp -= damage;
+		if(hp <= 0) {
+			alive = false;
+			return true;
+		}
 		return false;
 	}
 	

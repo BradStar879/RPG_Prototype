@@ -5,7 +5,10 @@ import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+
+import display.BufferedImageLoader;
 
 public class BaseCharacter {
 	
@@ -20,22 +23,35 @@ public class BaseCharacter {
 	boolean alive;
 	int wd;
 	int ht;
+	int gmWd;
+	int gmHt;
 	
-	String name;
-	int hp;
-	int maxHp;
-	int mp;
-	int maxMp;
+	public String name;
+	public int hp;
+	public int maxHp;
+	public int mp;
+	public int maxMp;
 	int time;
 	int timeMax;
-	int speed;
-	int experience;
-	int level;
-	int attack;
-	int armor;
+	public int speed;
+	public int experience;
+	public int level;
+	public int attack;
+	public int armor;
+	public String className;
 	int lane;
 	int range;
+	public int baseSpellAttack;
+	int baseSpeed;
 	int distance;
+	int rowCoord0;
+	int rowCoord1;
+	int rowCoord2;
+	int arrowFloat;
+	int floatCount;
+	
+	BufferedImageLoader loader;
+	Image arrow;
 	
 	String[] moveSet;
 	boolean[] isMoveOnCooldown;
@@ -53,7 +69,7 @@ public class BaseCharacter {
 		this.col = col;
 	}
 	
-	public BaseCharacter(int num, int pos, Color col, String name, int level, int hp, int maxHp, int mp, int maxMp, int speed, int attack, int range) {
+	public BaseCharacter(int num, int pos, Color col, String name, int level, int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack) {
 		this.num = num;
 		this.pos = pos;
 		this.col = col;
@@ -64,8 +80,10 @@ public class BaseCharacter {
 		this.mp = mp;
 		this.maxMp = maxMp;
 		this.speed = speed;
+		this.baseSpeed = speed;
 		this.attack = attack;
-		this.range = range;
+		this.armor = armor;
+		this.baseSpellAttack = baseSpellAttack;
 	}
 	
 	public void init() {
@@ -73,10 +91,20 @@ public class BaseCharacter {
 		selected = false;
 		attacking = false;
 		queued = false;
+		gmWd = GamePanel.WIDTH;
+		gmHt = GamePanel.HEIGHT;
 		wd = GamePanel.HEIGHT / 24;
 		ht = GamePanel.HEIGHT / 12;
 		time = (int)(Math.random() * 201 + 0);
 		timeMax = 10000;
+		rowCoord0 = gmHt * 7 / 16;
+		rowCoord1 = gmHt * 89 / 144;
+		rowCoord2 = gmHt * 13 / 16;
+		loader = new BufferedImageLoader();
+		arrow = loader.loadImage("/Arrow.png").getScaledInstance(gmHt / 36, gmHt / 18, Image.SCALE_SMOOTH);
+		arrowFloat = 0;
+		floatCount = 0;
+		
 		
 		moveSet = new String[]{"Attack", "Magic", "", "Item"};
 		isMoveOnCooldown = new boolean[]{false, false, false, false};
@@ -93,6 +121,7 @@ public class BaseCharacter {
 		
 		if(hp <= 0) {
 			alive = false;
+			attacking = false;
 		}
 		else alive = true;
 		
@@ -122,57 +151,68 @@ public class BaseCharacter {
 
 		if(attacking && baseMenu) BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
 				isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
+		
+		floatCount++;
+		if(floatCount >= 120) floatCount = 0;
+		if(floatCount % 5 == 0) {
+			if(floatCount < 20) arrowFloat += gmHt / 288;
+			else if(floatCount < 40) arrowFloat += gmHt / 144;
+			else if(floatCount < 60) arrowFloat += gmHt / 288;
+			else if(floatCount < 80) arrowFloat -= gmHt / 288;
+			else if(floatCount < 100) arrowFloat -= gmHt / 144;
+			else arrowFloat -= gmHt / 288;
+		}
 	}
 	
 	
 	public void draw(Graphics g) {
 		if(selected) {
 			g.setColor(Color.YELLOW);
-			g.fillRect(this.x - 15, this.y - 15, 60, 90);
+			g.fillRect(this.x - gmHt / 48, this.y - gmHt / 48, gmHt / 12, gmHt / 8);
 		}
 		g.setColor(col);
 		if(pos == 0) {
-			x = 460;
-			y = 315;
+			x = gmHt * 23 / 36;
+			y = rowCoord0;
 		}
 		if(pos == 1) {
-			x = 625;
-			y = 315;
+			x = gmHt * 125 / 144;
+			y = rowCoord0;
 		}
 		if(pos == 2) {
-			x = 790;
-			y = 315;
+			x = gmHt * 79 / 72;
+			y = rowCoord0;
 		}
 		if(pos == 3) {
-			x = 425;
-			y = 445;
+			x = gmHt * 85 / 144;
+			y = rowCoord1;
 		}
 		if(pos == 4) {
-			x = 625;
-			y = 445;
+			x = gmHt * 125 / 144;
+			y = rowCoord1;
 		}
 		if(pos == 5) {
-			x = 825;
-			y = 445;
+			x = gmHt * 55 / 48;
+			y = rowCoord1;
 		}
 		if(pos == 6) {
-			x = 390;
-			y = 585;
+			x = gmHt * 13 / 24;
+			y = rowCoord2;
 		}
 		if(pos == 7) {
-			x = 625;
-			y = 585;
+			x = gmHt * 125 / 144;
+			y = rowCoord2;
 		}
 		if(pos == 8) {
-			x = 860;
-			y = 585;
+			x = gmHt * 43 / 36;
+			y = rowCoord2;
 		}
 		
 		g.fillRect(x, y, wd, ht);
 		
 		if(attacking) {
-			g.setColor(Color.RED);
-			g.fillRect(x + 10, y - 30, 10, 20);
+			
+			g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 12 - arrowFloat, null);
 		}
 		
 	}
@@ -315,11 +355,11 @@ public class BaseCharacter {
 		}
 	}
 	
-	public void takeDamage(int attack) {
-		if(armor >= attack) {
+	public void takeDamage(int damage) {
+		if(armor >= damage) {
 			hp -= 1;
 		}
-		else hp -= attack - armor;
+		else hp -= damage - armor;
 		if(hp <= 0) {
 			hp = 0;
 		}

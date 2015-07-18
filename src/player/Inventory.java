@@ -1,11 +1,16 @@
 package player;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Inventory {
+public class Inventory implements Serializable{
 	
-	Map<String, Integer> itemList = new HashMap();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9054539503023L;
+	Map<String, Integer> itemList = new HashMap<String, Integer>();
 	
 	public Inventory() {
 		
@@ -38,5 +43,13 @@ public class Inventory {
 			i++;
 		}
 		return temp;
+	}
+	
+	public int size() {
+		return itemList.size();
+	}
+	
+	public boolean isEmpty() {
+		return itemList.isEmpty();
 	}
 }

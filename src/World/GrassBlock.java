@@ -1,14 +1,21 @@
-package World;
+package world;
 
-import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Image;
 
+import javax.swing.ImageIcon;
 
 
 public class GrassBlock extends BaseWorldBlock{
 	
+	Image blockType = new ImageIcon("Sprites/GrassBlock.png").getImage();
+	
 	public GrassBlock(int wd) {
-		super(wd);
+		this.wd = wd;
 		walkable = true;
-		col = Color.GREEN;
+	}
+	
+	public void draw(Graphics g) {
+		g.drawImage(blockType, x, y, wd, wd, null);
 	}
 }

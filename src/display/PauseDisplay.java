@@ -7,7 +7,10 @@ import game.main.GamePanel;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
 
 public class PauseDisplay {
 	
@@ -16,6 +19,9 @@ public class PauseDisplay {
 	int border = ht / 62;
 	int pauseWd = wd / 4;
 	int pauseHt = ht / 6;
+	BufferedImageLoader loader = new BufferedImageLoader();
+	Image sideArrow = loader.loadImage("/SideArrow.png").getScaledInstance(border * 2, border, Image.SCALE_SMOOTH);
+	Image pauseBox = new ImageIcon("Sprites/PauseBox.png").getImage();
 	
 	boolean paused = false;
 	String[] pauseOptions = new String[]{"Resume", "Options", "Quit"};
@@ -27,18 +33,14 @@ public class PauseDisplay {
 	public void draw(Graphics g) {
 		
 		if(paused) {
+			g.drawImage(pauseBox, wd / 2 - pauseWd / 2, ht / 2 - pauseHt / 2, pauseWd, pauseHt, null);
 			g.setColor(Color.WHITE);
-			g.fillRect(wd / 2 - pauseWd / 2, ht / 2 - pauseHt / 2, pauseWd, pauseHt);
-			g.setColor(Color.BLUE);
-			g.fillRect(wd / 2 - pauseWd / 2 + border, ht / 2 - pauseHt / 2 + border, pauseWd - 2 * border, pauseHt - 2 * border);
-			g.setColor(Color.WHITE);
-			g.setFont(new Font("Arial", Font.PLAIN, ht / 40));
+			g.setFont(new Font("pixelmix", Font.PLAIN, ht / 45));
 			for(int i = 0; i < 3; i++) {
-				g.drawString(pauseOptions[i], wd / 2 - pauseWd / 2 + 3 * border + (pauseWd * i / 3), ht / 2 + border / 2);
+				g.drawString(pauseOptions[i], wd / 2 - pauseWd / 2 + border * 7 / 2 + (pauseWd * i / 3), ht / 2 + border / 2);
 			}
 			
-			g.setColor(Color.RED);
-			g.fillRect(wd / 2 - pauseWd / 2 + border * 3 / 2 + (pauseWd * pauseSelect / 3), ht / 2 + border / 2 - border, border, border);
+			g.drawImage(sideArrow, wd / 2 - pauseWd / 2 + border + (pauseWd * pauseSelect / 3), ht / 2 + border / 2 - border, null);
 		}
 	}
 	

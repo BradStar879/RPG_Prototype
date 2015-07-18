@@ -6,31 +6,29 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 
 public class Spearman extends BaseCharacter{
-	
-	int baseRange;
 
 	public Spearman(int num, int pos, Color col, String name, int level,
-			int hp, int maxHp, int mp, int maxMp, int speed, int attack,
-			int range) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, 2);
+			int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor, 
+			int baseSpellAttack) {
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack);
 	}
 	
 	public void init() {
 		super.init();
+		className = "Spearman";
+		range = 2;
 		moveSet[0] =  "Attack";
 		moveSet[1] = "Stretch";
 		moveSet[2] = "";
 		moveSet[3] = "Item";
-
-		baseRange = range;
 	}
 	
 	public void tick() {
 		super.tick();
 		if(moveCooldown[1] > 0) {
 			moveCooldown[1]--;
-			if(moveCooldown[1] > 900) range = baseRange + 1;
-			else range = baseRange;
+			if(moveCooldown[1] > 900) range = 3;
+			else range = 2;
 		}
 	}
 	

@@ -5,17 +5,23 @@ import game.main.GamePanel;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 
-import World.BaseWorldBlock;
-import World.GrassBlock;
-import World.WaterBlock;
+
+import player.CharacterStats;
+import player.Inventory;
+import player.PlayerMover;
+import world.BaseWorldBlock;
+import world.GrassBlock;
+import world.WaterBlock;
+import display.Animations;
+import display.BufferedImageLoader;
+import display.WorldPauseDisplay;
 
 public class World extends GameState{
 	
 	int shiftX;
 	int shiftY;
-	int x;
-	int y;
 	int dir;
 	int speed;
 	int temp;
@@ -25,9 +31,22 @@ public class World extends GameState{
 	int wd;
 	int ht;
 	int battleProb;
+	public static boolean loading = false;
+	boolean battle;
+	static boolean paused;
+	static boolean exit;
 	BaseWorldBlock[][] world;
-	GrassBlock[] grassBlocks;
-	WaterBlock[] waterBlocks;
+	public static PlayerMover player;
+	public static PlayerMover loadedPlayer;
+	public static CharacterStats[] team;
+	public static Inventory inv;
+	
+	BufferedImageLoader loader;
+	private BufferedImage worldDrawn = null;
+	int worldLength;
+	int worldHeight;
+	
+	public WorldPauseDisplay pDisplay;
 
 	public World(GameStateManager gsm) {
 		super(gsm);
@@ -37,41 +56,36 @@ public class World extends GameState{
 	
 	public void init() {
 		
+		
 		wd = GamePanel.WIDTH;
 		ht = GamePanel.HEIGHT;
 		blockSize = ht / 12;
-		x = 11;
-		y = 6;
-		shiftX = 0;
-		shiftY = 0;
+		if(!loading) {
+			shiftX = 8;
+			shiftY = 8;
+			player = new PlayerMover(Color.BLACK, shiftX + 11, shiftY + 6, 0);
+			inv = new Inventory();
+		}
+		else {
+			shiftX = player.x - 11;
+			shiftY = player.y - 6;
+		}
 		dir = 0;
 		moveTime = 0;
 		speed = blockSize / 15;
 		moving = false;
 		battleProb = 8;
-		world = new BaseWorldBlock[50][50];
-		grassBlocks = new GrassBlock[2500]; 
-		waterBlocks = new WaterBlock[500];
-		for(int i = 0; i < 2500; i++) grassBlocks[i] = new GrassBlock(blockSize);
-		for(int i = 0; i < 500; i++) waterBlocks[i] = new WaterBlock(blockSize);
-		temp = 0;
-		for(int i = 1; i < 49; i++) {
-			for(int j = 0; j < 50; j++) {
-				world[i][j] = grassBlocks[temp].set(j * blockSize + (shiftX * blockSize), i * blockSize + (shiftY * blockSize));
-				temp++;
-			}
-		}
-		for(int i = 0; i < 50; i++) {
-			world[0][i] = waterBlocks[i].set(i * blockSize + (shiftX * blockSize), 0 * blockSize + (shiftY * blockSize));
-			world[49][i] = waterBlocks[i+50].set(i * blockSize + (shiftX * blockSize), 49 * blockSize + (shiftY * blockSize));
-		}
-		for(int i = 1; i < 49; i++) {
-			world[i][0] = waterBlocks[i+100].set(0 * blockSize + (shiftX * blockSize), i * blockSize + (shiftY * blockSize));
-			world[i][49] = waterBlocks[i+150].set(49 * blockSize + (shiftX * blockSize), i * blockSize + (shiftY * blockSize));
-		}
-			
-			world[3][3] = waterBlocks[201].set(3 * blockSize + (shiftX * blockSize), 3 * blockSize + (shiftY * blockSize));
-			world[7][4] = waterBlocks[202].set(4 * blockSize + (shiftX * blockSize), 7 * blockSize + (shiftY * blockSize));
+		battle = false;
+		paused = false;
+		exit = false;
+		loader = new BufferedImageLoader();
+		worldDrawn = loader.loadImage("/World2.png");
+		worldLength = 200;
+		worldHeight = 200;
+		world = new BaseWorldBlock[worldHeight][worldLength];
+		loadImageLevel(worldDrawn);
+		pDisplay = new WorldPauseDisplay();
+		
 		
 	}
 
@@ -79,78 +93,78 @@ public class World extends GameState{
 	public void tick() {
 		
 		
-		if(moving) {
-			if(dir == 0 & world[y-1][x].walkable) {
+		if(moving && !paused) {
+			if(dir == 0 & world[player.y-1][player.x].walkable) {
 				if(moveTime == 4) {
-					y--;
-					shiftY++;
-					for(int i = 0; i < 50; i++) {
-						for(int j = 0; j < 50; j++) {
-							world[i][j].set(j * blockSize + (shiftX * blockSize), i * blockSize + (shiftY * blockSize));
+					player.y--;
+					shiftY--;
+					for(int i = 0; i < worldHeight; i++) {
+						for(int j = 0; j < worldLength; j++) {
+							world[i][j].set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 						}
 					}
 					battleChance();
 				}
 				else {
-					for(int i = 0; i < 50; i++) {
-						for(int j = 0; j < 50; j++) {
+					for(int i = 0; i < worldHeight; i++) {
+						for(int j = 0; j < worldLength; j++) {
 							world[i][j] = world[i][j].set(world[i][j].x, world[i][j].y + speed);
 						}
 					}
 				}
 			}
-			else if(dir == 1 & world[y][x+1].walkable) {
+			else if(dir == 1 & world[player.y][player.x+1].walkable) {
 				if(moveTime == 4) {
-					x++;
-					shiftX--;
-					for(int i = 0; i < 50; i++) {
-						for(int j = 0; j < 50; j++) {
-							world[i][j].set(j * blockSize + (shiftX * blockSize), i * blockSize + (shiftY * blockSize));
+					player.x++;
+					shiftX++;
+					for(int i = 0; i < worldHeight; i++) {
+						for(int j = 0; j < worldLength; j++) {
+							world[i][j].set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 						}
 					}
 					battleChance();
 				}
 				else {
-					for(int i = 0; i < 50; i++) {
-						for(int j = 0; j < 50; j++) {
+					for(int i = 0; i < worldHeight; i++) {
+						for(int j = 0; j < worldLength; j++) {
 							world[i][j] = world[i][j].set(world[i][j].x - speed, world[i][j].y);
 						}
 					}
 				}
 			}
-			else if(dir == 2 & world[y+1][x].walkable) {
+			else if(dir == 2 & world[player.y+1][player.x].walkable) {
 				if(moveTime == 4) {
-					y++;
-					shiftY--;
-					for(int i = 0; i < 50; i++) {
-						for(int j = 0; j < 50; j++) {
-							world[i][j].set(j * blockSize + (shiftX * blockSize), i * blockSize + (shiftY * blockSize));
+					player.y++;
+					shiftY++;
+					for(int i = 0; i < worldHeight; i++) {
+						for(int j = 0; j < worldLength; j++) {
+							world[i][j].set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 						}
 					}
 					battleChance();
 				}
 				else {
-					for(int i = 0; i < 50; i++) {
-						for(int j = 0; j < 50; j++) {
+					for(int i = 0; i < worldHeight; i++) {
+						for(int j = 0; j < worldLength; j++) {
 							world[i][j] = world[i][j].set(world[i][j].x, world[i][j].y - speed);
 						}
 					}
 				}
 			}
-			else if(dir == 3 & world[y][x-1].walkable) {
+			else if(dir == 3 & world[player.y][player.x-1].walkable) {
 				if(moveTime == 4) {
-					x--;
-					shiftX++;
-					for(int i = 0; i < 50; i++) {
-						for(int j = 0; j < 50; j++) {
-							world[i][j].set(j * blockSize + (shiftX * blockSize), i * blockSize + (shiftY * blockSize));
+					player.x--;
+					shiftX--;
+					for(int i = 0; i < worldHeight; i++) {
+						for(int j = 0; j < worldLength; j++) {
+							world[i][j].set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 						}
 					}
 					battleChance();
 				}
 				else {
-					for(int i = 0; i < 50; i++) {
-						for(int j = 0; j < 50; j++) {
+					for(int i = 0; i < worldHeight; i++) {
+						for(int j = 0; j < worldLength; j++) {
 							world[i][j] = world[i][j].set(world[i][j].x + speed, world[i][j].y);
 						}
 					}
@@ -159,51 +173,65 @@ public class World extends GameState{
 			else moveTime = 4;
 		}
 		
-		if(moveTime > 0) moveTime -= 4;
-		if(moveTime <= 0) moving = false;
+		if(moveTime > 0 && !paused) moveTime -= 4;
+		if(moveTime <= 0 && !paused) moving = false;
+		
+		if(exit) gsm.states.remove(this);
 	}
 
 	
 	public void draw(Graphics g) {
 		
-		for(int i = 0; i < 50; i++) {
-			for(int j = 0; j < 50; j++) {
+		for(int i = player.y - 8; i < player.y + 8; i++) {
+			for(int j = player.x - 13; j < player.x + 13; j++) {
 				world[i][j].draw(g);
 			}
 		}
 		
 		g.setColor(Color.BLACK);
 		g.fillRect(blockSize * 11 + blockSize / 4,  blockSize * 6 + blockSize / 4, blockSize / 2, blockSize / 2);
+		if(battle)
+			if(Animations.splitScreenVert(g, 180)) battleEngage();
+		
+		pDisplay.draw(g);
 		
 	}
 
 	
 	public void keyPressed(int k) {
-		if(!moving) {
+		if(!moving && !battle && !paused) {
 			if(k == KeyEvent.VK_W) {
 				moving = true;
 				moveTime = 60;
 				dir = 0;
+				player.steps++;
 			}
 			else if(k == KeyEvent.VK_D) {
 				moving = true;
 				moveTime = 60;
 				dir = 1;
+				player.steps++;
 			}
 			else if(k == KeyEvent.VK_S) {
 				moving = true;
 				moveTime = 60;
 				dir = 2;
+				player.steps++;
 			}
 			else if(k == KeyEvent.VK_A) {
 				moving = true;
 				moveTime = 60;
 				dir = 3;
+				player.steps++;
 			}
+			else if(k == KeyEvent.VK_Q) battle = true;
 		}
-		if(k == KeyEvent.VK_ESCAPE) {
-			gsm.states.remove(this);
+		if(k == KeyEvent.VK_ESCAPE && !battle && !paused) {
+			paused = true;
+			pDisplay.pause();
 		}
+		
+		pDisplay.keyPressed(k);
 		
 	}
 
@@ -213,10 +241,45 @@ public class World extends GameState{
 		
 	}
 	
+	private void loadImageLevel(BufferedImage image) {
+		
+		int w = image.getWidth();
+		int h = image.getHeight();
+		
+		for(int i = 0; i < h; i++) 
+			for(int j = 0; j < w; j++) {
+				
+				int pixel = image.getRGB(j, i);
+				//int r = (pixel >> 16) & 0xff;
+				int g = (pixel >> 8) & 0xff;
+				int b = (pixel) & 0xff;
+				
+				if(b == 255) world[i][j] = new WaterBlock(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
+				else if(g == 255) world[i][j] = new GrassBlock(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
+			}
+		
+	}
+	
 	public void battleChance() {
-		if(Math.random() * 100 < battleProb) {
-			gsm.states.push(new BaseLevel(gsm));
+		if(Math.random() * 100 < battleProb && player.steps > 4) {
+			player.steps = 0;
+			//battle = true;
 		}
+	}
+	
+	public void battleEngage() {
+		battle = false;
+		Animations.delay = 0;
+		BaseLevel.team = World.team;
+		gsm.states.push(new BaseLevel(gsm));
+	}
+	
+	public static void exit() {
+		exit = true;
+	}
+	
+	public static void unpause() {
+		paused = false;
 	}
 
 }

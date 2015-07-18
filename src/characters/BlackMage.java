@@ -8,13 +8,15 @@ import java.awt.event.KeyEvent;
 public class BlackMage extends BaseCharacter{
 
 	public BlackMage(int num, int pos, Color col, String name, int level,
-			int hp, int maxHp, int mp, int maxMp, int speed, int attack,
-			int range) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, 3);
+			int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor,
+			int baseSpellAttack) {
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack);
 	}
 	
 	public void init() {
 		super.init();
+		className = "Black Mage";
+		range = 3;
 		moveSet[0] =  "Attack";
 		moveSet[1] = "Magic";
 		moveSet[2] = "Dark Magic";
@@ -40,7 +42,17 @@ public class BlackMage extends BaseCharacter{
 			spellCooldown[1]--;
 		}
 		else isSpellOnCooldown[1] = false;
+		
+		if(spellCooldown[2] > 0) {
+			spellCooldown[2]--;
+		}
+		else isSpellOnCooldown[2] = false;
+		
+		if(distance == 2) speed = baseSpeed + 10;
+		else speed = baseSpeed;
 	}
+	
+	
 	
 	public void keyPressed(int k) {
 		if(selected) {
@@ -85,19 +97,22 @@ public class BlackMage extends BaseCharacter{
 					spellMenu = true;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Fire")) {
-					attack();
+				else if(BaseLevel.getMenuOption().equals("Fire") && !isSpellOnCooldown[0] && mp >= 20) {
+					fire();
 					spellMenu = false;
+					mp -= 20;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Ice")) {
-					attack();
+				else if(BaseLevel.getMenuOption().equals("Ice") && !isSpellOnCooldown[1] && mp >= 20) {
+					ice();
 					spellMenu = false;
+					mp -= 20;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Lightning")) {
-					attack();
+				else if(BaseLevel.getMenuOption().equals("Lightning") && !isSpellOnCooldown[2] && mp >= 20) {
+					lightning();
 					spellMenu = false;
+					mp -= 20;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 			}
@@ -115,6 +130,69 @@ public class BlackMage extends BaseCharacter{
 				}
 			BaseLevel.changeMenuSelect("LEFT");
 			}
+		}
+	}
+	
+	public void fire() {
+		time = 0;
+		spellCooldown[0] = 1800;
+		isSpellOnCooldown[0] = true;
+		attacking = false;
+		queued = false;
+		BaseLevel.dequeueTurn();
+		if(distance == 2) {
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
+			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, baseSpellAttack);
+			else BaseLevel.attackMob(lane, baseSpellAttack, "Fire");
+		}
+		else if(distance == 1) {
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
+			else BaseLevel.attackMob(lane, baseSpellAttack, "Fire");
+		}
+		else {
+			BaseLevel.attackMob(lane, baseSpellAttack, "Fire");
+		}
+	}
+	
+	public void ice() {
+		time = 0;
+		spellCooldown[1] = 1800;
+		isSpellOnCooldown[1] = true;
+		attacking = false;
+		queued = false;
+		BaseLevel.dequeueTurn();
+		if(distance == 2) {
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
+			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, baseSpellAttack);
+			else BaseLevel.attackMob(lane, baseSpellAttack, "Ice");
+		}
+		else if(distance == 1) {
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
+			else BaseLevel.attackMob(lane, baseSpellAttack, "Ice");
+		}
+		else {
+			BaseLevel.attackMob(lane, baseSpellAttack, "Ice");
+		}
+	}
+	
+	public void lightning() {
+		time = 0;
+		spellCooldown[2] = 1800;
+		isSpellOnCooldown[2] = true;
+		attacking = false;
+		queued = false;
+		BaseLevel.dequeueTurn();
+		if(distance == 2) {
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
+			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, baseSpellAttack);
+			else BaseLevel.attackMob(lane, baseSpellAttack, "Lightning");
+		}
+		else if(distance == 1) {
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
+			else BaseLevel.attackMob(lane, baseSpellAttack, "Lightning");
+		}
+		else {
+			BaseLevel.attackMob(lane, baseSpellAttack, "Lightning");
 		}
 	}
 

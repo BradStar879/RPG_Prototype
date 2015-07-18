@@ -7,17 +7,24 @@ import java.awt.event.KeyEvent;
 
 public class Archer extends BaseCharacter{
 	
-	int baseSpeed;
 	int speedBooster;
 	int speedBoostDuration;
+	int critChance;
+	int baseAttack;
+	int critAttack;
 
 	public Archer(int num, int pos, Color col, String name, int level, int hp,
-			int maxHp, int mp, int maxMp, int speed, int attack, int range) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, 3);
+			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack) {
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack);
+		this.baseAttack = attack;
+		this.critAttack = (int)(attack * 2.2);
 	}
 	
 	public void init() {
 		super.init();
+		className = "Archer";
+		range = 3;
+		critChance = 10;
 		moveSet[0] =  "Attack";
 		moveSet[1] = "Speed Up";
 		moveSet[2] = "";
@@ -80,7 +87,12 @@ public class Archer extends BaseCharacter{
 			if(k == KeyEvent.VK_RIGHT) {
 				if(BaseLevel.getMenuOption().equals("Attack")) {
 					time = 0;
-					attack();
+					if(Math.random() * 100 < critChance) {
+						attack = critAttack;
+						attack();
+						attack = baseAttack;
+					}
+					else attack();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("Speed Up") && !isMoveOnCooldown[1]) {

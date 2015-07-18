@@ -1,8 +1,14 @@
 package display;
 
+import game.gamestate.BaseLevel;
+import game.main.GamePanel;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
 
 import characters.BaseCharacter;
 
@@ -10,59 +16,51 @@ public class InfoDisplay {
 	
 	int infoWd;
 	int infoHt;
-	int ht;
-	int border;
+	int ht = GamePanel.HEIGHT;
+	int wd = GamePanel.WIDTH;
+	int border = ht / 62;
 	BaseCharacter c;
 	int factor;
+	Image stats = new ImageIcon("Sprites/CharacterStatsBox.png").getImage();
+	Image statsSelected = new ImageIcon("Sprites/CharacterStatsBoxYellow.png").getImage();
+	Image green = new ImageIcon("Sprites/GreenInfoBar.png").getImage();
+	Image yellow = new ImageIcon("Sprites/YellowInfoBar.png").getImage();
+	Image orange = new ImageIcon("Sprites/OrangeInfoBar.png").getImage();
+	Image red = new ImageIcon("Sprites/RedInfoBar.png").getImage();
+	Image purple = new ImageIcon("Sprites/PurpleInfoBar.png").getImage();
+	Image cyan = new ImageIcon("Sprites/CyanInfoBar.png").getImage();
+	Image health;
 	
-	public InfoDisplay(int infoWd, int infoHt, int ht, int border, BaseCharacter c, int factor) {
-		this.infoWd = infoWd;
-		this.infoHt = infoHt;
-		this.ht = ht;
-		this.border = border;
+	public InfoDisplay(BaseCharacter c, int factor) {
 		this.c = c;
 		this.factor = factor;
 	}
 	
 	public void draw(Graphics g) {
 		
-		//Top right text of info box
-		g.setColor(c.getColor());
-		g.fillRect(2 * border, 2 * border + (factor * (infoHt + 2 * border)), infoWd * 45 / 100, infoHt / 2);
-		g.setFont(new Font("Arial", Font.PLAIN, ht / 40));
+		if(BaseLevel.getCharSelected() == factor) g.drawImage(statsSelected, 0, factor * (ht / 3), wd / 6, ht / 3, null);
+		else g.drawImage(stats, 0, factor * (ht / 3), wd / 6, ht / 3, null);
 		g.setColor(Color.WHITE);
-		g.drawString(c.getName(), infoWd * 45 / 100 + 3 * border, 4 * border + (factor * (infoHt + 2 * border)));
-		g.drawString("Level: " + c.getLevel(), infoWd * 45 / 100 + 3 * border, 7 * border + (factor * (infoHt + 2 * border)));
-		g.setColor(Color.RED);
-		if(!c.getAlive()) g.drawString("DEAD", infoWd * 45 / 100 + 3 * border, 9 * border + (factor * (infoHt + 2 * border)));
-				
-		//Hp text and bar of info box
-		g.setColor(Color.WHITE);
-		g.setFont(new Font("Arial", Font.BOLD, ht / 60));
-		g.drawString("HP: " + c.getHp() + " / " + c.getMaxHp(), 2 * border, infoHt / 2 + 3 * border + (border / 2) + (factor * (infoHt + 2 * border)));
-		if((double)c.getHp() / (double)c.getMaxHp() >= .75) g.setColor(Color.GREEN);
-		else if((double)c.getHp() / (double)c.getMaxHp() >= .5) g.setColor(Color.ORANGE);
-		else if((double)c.getHp() / (double)c.getMaxHp() >= .25) g.setColor(Color.YELLOW);
-		else g.setColor(Color.RED);
-		g.fillRect(3 * border, infoHt / 2 + 3 * border + (border * 2 / 3) + (factor * (infoHt + 2 * border)), (infoWd * 3 / 4) * c.getHp() / c.getMaxHp(), border);
-		g.setColor(Color.BLACK);
-		g.drawRect(3 * border, infoHt / 2 + 3 * border + (border * 2 / 3) + (factor * (infoHt + 2 * border)), infoWd * 3 / 4, border);
-				
-		//Mp text and bar of info box
-		g.setColor(Color.WHITE);
-		g.drawString("MP: " + c.getMp() + " / " + c.getMaxMp(), 2 * border, infoHt / 2 + 6 * border + (factor * (infoHt + 2 * border)));
-		g.setColor(Color.MAGENTA);
-		if(c.getMaxMp() > 0) g.fillRect(3 * border, infoHt / 2 + 6 * border + (border / 3) + (factor * (infoHt + 2 * border)), (infoWd * 3 / 4) * c.getMp() / c.getMaxMp(), border);
-		g.setColor(Color.BLACK);
-		g.drawRect(3 * border, infoHt / 2 + 6 * border + (border / 3) + (factor * (infoHt + 2 * border)), infoWd * 3 / 4, border);
-				
-		//Timer text and bar of info box
-		g.setColor(Color.WHITE);
-		g.drawString("Time", 2 * border, infoHt / 2 + 8 * border + (border / 2) + (factor * (infoHt + 2 * border)));
-		g.setColor(Color.CYAN);
-		g.fillRect(3 * border, infoHt / 2 + 9 * border + (factor * (infoHt + 2 * border)), (infoWd * 3 / 4) * c.getTime() / c.getTimeMax(), border);
-		g.setColor(Color.BLACK);
-		g.drawRect(3 * border, infoHt / 2 + 9 * border + (factor * (infoHt + 2 * border)), infoWd * 3 / 4, border);
+		g.setFont(new Font("pixelmix", Font.PLAIN, ht / 45));
+		g.drawString("" + c.getName(), border * 2, factor * (ht / 3) + 15 * border / 4);
+		g.drawString("" + c.className, border * 2, factor * (ht / 3) + 13 * border / 2);
+		g.drawString("Level: " + c.getLevel(), border * 2, factor * (ht / 3) + 9 * border);
+		if(c.getHp() > 0) g.drawString("HP: " + c.getHp() + "/" + c.getMaxHp(), border * 2, factor * (ht / 3) + 47 * border / 4);
+		else {
+			g.setColor(Color.RED);
+			g.drawString("DEAD", border * 2, factor * (ht / 3) + 47 * border / 4);
+			g.setColor(Color.WHITE);
+		}
+		g.drawString("MP: " + 	c.getMp() + "/" + c.getMaxMp(), border * 2, factor * (ht / 3) + 61 * border / 4);
+		g.drawString("Time: ", border * 2, factor * (ht / 3) + 75 * border / 4);
+		
+		if((double)c.getHp() / (double)c.getMaxHp() >= .75) health = green;
+		else if((double)c.getHp() / (double)c.getMaxHp() >= .5) health = yellow;
+		else if((double)c.getHp() / (double)c.getMaxHp() >= .25) health = orange;
+		else health = red;
+		g.drawImage(health, border * 2, factor * (ht / 3) + border * 197 / 16, (wd / 8 + border) * c.getHp() / c.getMaxHp(), border,  null);
+		if(c.getMaxMp() > 0) g.drawImage(purple, border * 2, factor * (ht / 3) + border * 63 / 4, (wd / 8 + border) * c.getMp() / c.getMaxMp(), border, null);
+		g.drawImage(cyan, border * 2, factor * (ht / 3) + border * 309 / 16, (wd / 8 + border) * c.getTime() / c.getTimeMax(), border, null);
 		
 		
 	}

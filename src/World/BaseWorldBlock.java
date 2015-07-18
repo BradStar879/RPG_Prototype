@@ -1,9 +1,10 @@
-package World;
+package world;
+
+import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Graphics;
-
-import game.main.GamePanel;
+import java.awt.Image;
 
 public class BaseWorldBlock {
 	
@@ -13,10 +14,9 @@ public class BaseWorldBlock {
 	Color col;
 	public int x;
 	public int y;
+	Image blockType;
 	
-	public BaseWorldBlock(int wd) {
-		this.wd = wd;
-	}
+	public BaseWorldBlock() {}
 
 	public BaseWorldBlock set(int x, int y) {
 		this.x = x; 

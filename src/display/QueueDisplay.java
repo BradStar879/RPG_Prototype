@@ -1,11 +1,13 @@
 package display;
 
-import game.gamestate.BaseLevel;
 import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
 
 import characters.BaseCharacter;
 
@@ -17,6 +19,7 @@ public class QueueDisplay {
 	int queueWd = wd / 8;
 	int queueHt = ht / 4;
 	int border = ht / 62;
+	Image queueBox = new ImageIcon("Sprites/QueueBox.png").getImage();
 	String[][] movesOnCooldown = new String[3][4];
 	String[][] spellsOnCooldown = new String[3][4];
 	int[] amountMovesOnCooldown = new int[3];
@@ -44,12 +47,9 @@ public class QueueDisplay {
 		
 		for(int j = 0; j < 3; j++) {
 			if(disQueue[j] != null) {
+				g.drawImage(queueBox, wd - queueWd, ht - (queueHt * (2 + j)), queueWd, queueHt, null);
 				g.setColor(Color.WHITE);
-				g.fillRect(wd - queueWd, ht - (queueHt * (2 + j)), queueWd, queueHt);
-				g.setColor(Color.BLUE);
-				g.fillRect(wd - queueWd + border, ht - (queueHt * (2 + j)) + border, queueWd - 2 * border, queueHt - 2 * border);
-				g.setColor(Color.WHITE);
-				g.setFont(new Font("Arial", Font.BOLD, ht / 40));
+				g.setFont(new Font("pixelmix", Font.PLAIN, ht / 50));
 				g.drawString(disQueue[j].getName(), wd - queueWd + border * 2,  ht - (queueHt * (2 + j)) + border * 3);
 				for(int i = 0; i < amountMovesOnCooldown[j]; i++)
 					g.drawString(movesOnCooldown[j][i] + ": " + moveCooldowns[j][i],  wd - queueWd + border * 2, ht - (queueHt * (2 + j)) + border * 3 + (2 * border * (i + 1)));

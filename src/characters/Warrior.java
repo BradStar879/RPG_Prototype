@@ -10,13 +10,15 @@ public class Warrior extends BaseCharacter{
 	boolean block;
 
 	public Warrior(int num, int pos, Color col, String name, int level, int hp,
-			int maxHp, int mp, int maxMp, int speed, int attack, int range) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, 1);
+			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack) {
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack);
 		
 	} 
 	
 	public void init() {
 		super.init();
+		className = "Warrior";
+		range = 1;
 		moveSet[0] =  "Attack";
 		moveSet[1] = "Block";
 		moveSet[2] = "";
@@ -92,9 +94,17 @@ public class Warrior extends BaseCharacter{
 		}
 	}
 	
-	public void takeDamage(int attack) {
+	public void takeDamage(int damage) {
 		if(block) block = false;
-		else hp -= attack - armor;
+		else {
+			if(armor >= damage) {
+				hp -= 1;
+			}
+			else hp -= damage - armor;
+			if(hp <= 0) {
+				hp = 0;
+			}
+		}
 	}
 	
 	public void block() {
