@@ -48,7 +48,7 @@ public class ClassSelection extends GameState{
 		classSelect = 0;
 		selected = 0;
 		classes = new String[]{"Warrior", "Black Mage", "White Mage", "Archer", "Spearman", "Monk"};
-		classTraits = new String[][] { {"Medium", "None", "Strong", "Slow", "Melee", "Block", "Blocks attacks", "in his column", ""},
+		classTraits = new String[][] { {"Medium", "None", "Very Strong", "Very Slow", "Melee", "Block", "Blocks attacks", "in his column", ""},
 		{"Weak", "Strong", "Weak", "Slow", "Ranged", "Black Magic", "Stronger and", "charges faster from back", "row"},  
 		{"Weak", "Strong", "Medium", "Medium", "Ranged", "White Magic", "Charges faster", "from back row and basic", "attacks heal allies"}, 
 		{"Medium", "None", "Medium", "Fast", "Ranged", "Rapid Fire", "Has chance", "for critical strike", ""},
@@ -77,7 +77,7 @@ public class ClassSelection extends GameState{
 		for(int i = 0; i < 6; i++) {
 			g.drawString("Class: " + classes[i], boxWd * (i % 3) + 3 * border, boxHt * (i / 3 + 1) - border * 21);
 			g.drawString("Attack: " + classTraits[i][0], boxWd * (i % 3) + 3 * border, boxHt * (i / 3 + 1) - border * 19);
-			g.drawString("Magic Attack: " + classTraits[i][1], boxWd * (i % 3) + 3 * border, boxHt * (i / 3 + 1) - border * 17);
+			g.drawString("Spell Power: " + classTraits[i][1], boxWd * (i % 3) + 3 * border, boxHt * (i / 3 + 1) - border * 17);
 			g.drawString("Defense: " + classTraits[i][2], boxWd * (i % 3) + 3 * border, boxHt * (i / 3 + 1) - border * 15);
 			g.drawString("Speed: " + classTraits[i][3], boxWd * (i % 3) + 3 * border, boxHt * (i / 3 + 1) - border * 13);
 			g.drawString("Range: " + classTraits[i][4], boxWd * (i % 3) + 3 * border, boxHt * (i / 3 + 1) - border * 11);

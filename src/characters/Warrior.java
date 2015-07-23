@@ -17,22 +17,27 @@ public class Warrior extends BaseCharacter{
 	
 	public void init() {
 		super.init();
+		mp = 0;
 		className = "Warrior";
 		range = 1;
-		moveSet[0] =  "Attack";
-		moveSet[1] = "Block";
-		moveSet[2] = "";
+		moveSet[0] = "Attack";
+		moveSet[1] = "Rage Attack";
+		moveSet[2] = "Block";
 		moveSet[3] = "Item";
+		
+		spellSet[0] = "Bash";
 		
 		block = false;
 	}
 	
 	public void tick() {
 		super.tick();
-		if(moveCooldown[1] > 0) {
-			moveCooldown[1]--;
+		if(moveCooldown[2] > 0) {
+			moveCooldown[2]--;
 		}
-		else isMoveOnCooldown[1] = false;
+		else isMoveOnCooldown[2] = false;
+		if(mp < 25) isSpellOnCooldown[0] = true;
+		else isSpellOnCooldown[0] = true;
 	}
 	
 	public void keyPressed(int k) {
@@ -69,12 +74,25 @@ public class Warrior extends BaseCharacter{
 			if(k == KeyEvent.VK_RIGHT) {
 				if(BaseLevel.getMenuOption().equals("Attack")) {
 					time = 0;
-					attack();
+					attack(attack);
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
+				else if(BaseLevel.getMenuOption().equals("Rage Attack")) {
+					BaseLevel.changeMenuOptions(spellSet[0], spellSet[1], spellSet[2], spellSet[3], 
+							isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
+					baseMenu = false;
+					spellMenu = true;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("Block") && !isMoveOnCooldown[1]) {
 					time = 0;
 					block();
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
+				else if(BaseLevel.getMenuOption().equals("Bash") && mp >= 25) {
+					time = 0;
+					spellMenu = false;
+					bash();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 			}
@@ -95,6 +113,7 @@ public class Warrior extends BaseCharacter{
 	}
 	
 	public void takeDamage(int damage) {
+		mp += damage * 3 / 5;
 		if(block) block = false;
 		else {
 			if(armor >= damage) {
@@ -109,11 +128,18 @@ public class Warrior extends BaseCharacter{
 	
 	public void block() {
 		block = true;
-		moveCooldown[1] = 1800;
-		isMoveOnCooldown[1] = true;
+		moveCooldown[2] = 3600;
+		isMoveOnCooldown[2] = true;
 		attacking = false;
 		queued = false;
 		BaseLevel.dequeueTurn();
+	}
+	
+	public void bash() {
+		mp -= 25;
+		attacking = false;
+		queued = false;
+		attack((int)(attack * 1.5));
 	}
 }
 

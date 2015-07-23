@@ -2,7 +2,6 @@ package world;
 
 import game.main.GamePanel;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 
@@ -11,7 +10,6 @@ public class BaseWorldBlock {
 	public int wd;
 	int ht = GamePanel.HEIGHT / 12;
 	public boolean walkable;
-	Color col;
 	public int x;
 	public int y;
 	Image blockType;
@@ -25,7 +23,6 @@ public class BaseWorldBlock {
 	}
 	
 	public void draw(Graphics g) {
-		g.setColor(col);
 		g.fillRect(x, y, wd, ht);
 	}
 }

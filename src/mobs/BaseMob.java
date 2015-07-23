@@ -34,15 +34,15 @@ public class BaseMob {
 		this.maxHp = hp;
 		this.attack = attack;
 		this.delay = delay;
-		this.delayCount = 0;
 		this.speed = speed;
+		this.delayCount = 0;
 	}
 	
 	public void init() {
 		wd = GamePanel.HEIGHT / 36;
 		ht = GamePanel.HEIGHT / 18;
-		time = (int)(Math.random() * 201 + 0);
-		timeMax = 5000;
+		time = (int)(Math.random() * (speed * 240) - speed * 120);
+		timeMax = 60000;
 		x = BaseLevel.getGridX(1) - (wd / 2) + ((BaseLevel.getGridX(2) - BaseLevel.getGridX(1)) * (lane + 1) / (4));
 		y = BaseLevel.getGridY(1) - ht * 2;
 	}
@@ -60,7 +60,7 @@ public class BaseMob {
 				if(delayCount == delay) {
 					delayCount = 0;
 					attack();
-					time = 0;
+					time = (int)(Math.random() * (speed * 240) - speed * 120);
 					attacking = false;
 				}
 			}

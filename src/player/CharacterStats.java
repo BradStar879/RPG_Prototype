@@ -18,70 +18,82 @@ public class CharacterStats implements Serializable {
 	public int level;
 	public int attack;
 	public int armor;
-	public int baseSpellAttack;
+	public int spellPower;
+	public int baseHp;
+	public int baseMp;
+	public int baseAttack;
+	public int baseArmor;
+	public int baseSpellPower;
 	
 	public CharacterStats(String name, String className) {
 		
 		this.name = name;
 		this.className = className;
 		if(className.equals("Warrior")) {
-			maxHp = 1000;
-			maxMp = 0;
-			speed = 30;
+			maxHp = 100;
+			maxMp = 75;
+			speed = 110;
 			attack = 15;
-			armor = 8;
-			baseSpellAttack = 0;
+			armor = 15;
+			spellPower = 0;
 		}
 		else if(className.equals("White Mage")) {
-			maxHp = 500;
-			maxMp = 200;
-			speed = 18;
+			maxHp = 50;
+			maxMp = 100;
+			speed = 125;
 			attack = 5;
-			armor = 2;
-			baseSpellAttack = 20;
+			armor = 7;
+			spellPower = 25;
 		}
 		else if(className.equals("Black Mage")) {
-			maxHp = 500;
-			maxMp = 200;
-			speed = 20;
-			attack = 8;
-			armor = 2;
-			baseSpellAttack = 40;
+			maxHp = 50;
+			maxMp = 100;
+			speed = 100;
+			attack = 5;
+			armor = 5;
+			spellPower = 40;
 		}
 		else if(className.equals("Archer")) {
-			maxHp = 700;
+			maxHp = 75;
 			maxMp = 0;
-			speed = 45;
-			attack = 13;
-			armor = 4;
-			baseSpellAttack = 0;
+			speed = 167;
+			attack = 15;
+			armor = 8;
+			spellPower = 10;
 		}
 		else if(className.equals("Spearman")) {
-			maxHp = 900;
-			maxMp = 0;
-			speed = 30;
-			attack = 17;
-			armor = 6;
-			baseSpellAttack = 0;
+			maxHp = 90;
+			maxMp = 50;
+			speed = 100;
+			attack = 15;
+			armor = 12;
+			spellPower = 0;
 		}
 		else if(className.equals("Monk")) {
-			maxHp = 800;
-			maxMp = 0;
-			speed = 35;
-			attack = 8;
-			armor = 5;
-			baseSpellAttack = 0;
+			maxHp = 75;
+			maxMp = 4;
+			speed = 125;
+			attack = 25;
+			armor = 10;
+			spellPower = 5;
 		}
+		
+		baseHp = maxHp;
+		baseMp = maxMp;
+		baseAttack = attack;
+		baseArmor = armor;
+		baseSpellPower = spellPower; 
 		
 		hp = maxHp;
 		mp = maxMp;
-		experience = 0;
+		experience = 0;	
 		level = 1;
 		experienceCap = 500;
 		
 	}
 	
 	public void levelUp() {
+		experience -= experienceCap;
 		level++;
 		maxHp *= 1.2;
 		maxMp *= 1.2;
@@ -90,8 +102,7 @@ public class CharacterStats implements Serializable {
 		speed++;
 		armor++;
 		attack++;
-		baseSpellAttack++;
-		experience = 0;
+		spellPower++;
 		experienceCap += 500;
 	}
 

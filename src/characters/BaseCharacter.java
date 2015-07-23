@@ -41,7 +41,7 @@ public class BaseCharacter {
 	public String className;
 	int lane;
 	int range;
-	public int baseSpellAttack;
+	public int spellPower;
 	int baseSpeed;
 	int distance;
 	int rowCoord0;
@@ -52,6 +52,7 @@ public class BaseCharacter {
 	
 	BufferedImageLoader loader;
 	Image arrow;
+	Image sprite;
 	
 	String[] moveSet;
 	boolean[] isMoveOnCooldown;
@@ -69,7 +70,7 @@ public class BaseCharacter {
 		this.col = col;
 	}
 	
-	public BaseCharacter(int num, int pos, Color col, String name, int level, int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack) {
+	public BaseCharacter(int num, int pos, Color col, String name, int level, int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor, int spellPower) {
 		this.num = num;
 		this.pos = pos;
 		this.col = col;
@@ -83,7 +84,7 @@ public class BaseCharacter {
 		this.baseSpeed = speed;
 		this.attack = attack;
 		this.armor = armor;
-		this.baseSpellAttack = baseSpellAttack;
+		this.spellPower = spellPower;
 	}
 	
 	public void init() {
@@ -96,7 +97,7 @@ public class BaseCharacter {
 		wd = GamePanel.HEIGHT / 24;
 		ht = GamePanel.HEIGHT / 12;
 		time = (int)(Math.random() * 201 + 0);
-		timeMax = 10000;
+		timeMax = 60000;
 		rowCoord0 = gmHt * 7 / 16;
 		rowCoord1 = gmHt * 89 / 144;
 		rowCoord2 = gmHt * 13 / 16;
@@ -168,7 +169,9 @@ public class BaseCharacter {
 	public void draw(Graphics g) {
 		if(selected) {
 			g.setColor(Color.YELLOW);
-			g.fillRect(this.x - gmHt / 48, this.y - gmHt / 48, gmHt / 12, gmHt / 8);
+			if(distance == 0) g.fillRect(this.x - gmHt / 48, this.y - gmHt / 48, gmHt / 12, gmHt / 8);
+			else if(distance == 1) g.fillRect(this.x - gmHt / 48, this.y - gmHt / 48, gmHt / 12, gmHt / 8);
+			else g.fillRect(this.x - gmHt / 48, this.y - gmHt / 48, gmHt / 12, gmHt / 8);
 		}
 		g.setColor(col);
 		if(pos == 0) {
@@ -208,7 +211,13 @@ public class BaseCharacter {
 			y = rowCoord2;
 		}
 		
-		g.fillRect(x, y, wd, ht);
+		if(className.equals("White Mage") || className.equals("Black Mage")) {
+			if(distance == 0) g.drawImage(sprite, x - gmHt / 36, y - gmHt / 24, null);
+			else if(distance == 1) g.drawImage(sprite, x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5, null);
+			else g.drawImage(sprite, x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4, null);
+			
+		}
+		else g.fillRect(x, y, wd, ht);
 		
 		if(attacking) {
 			
@@ -250,7 +259,7 @@ public class BaseCharacter {
 			if(k == KeyEvent.VK_DOWN) BaseLevel.changeMenuSelect("DOWN");
 			if(k == KeyEvent.VK_RIGHT) {
 				if(BaseLevel.getMenuOption().equals("Attack")) {
-					attack();
+					attack(attack);
 				}
 				BaseLevel.changeMenuSelect("RIGHT");
 			}
@@ -328,30 +337,30 @@ public class BaseCharacter {
 		return col;
 	}
 	
-	public void attack() {
+	public void attack(int damage) {
 		time = 0;
 		attacking = false;
 		queued = false;
 		BaseLevel.dequeueTurn();
 		if(range == 1) {
 			if(distance == 0) {
-				BaseLevel.attackMob(lane, attack);
+				BaseLevel.attackMob(lane, damage);
 			}
 			else {
-				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, attack);
+				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
 			}
 		}
 		else {
 			if(distance == 2) {
-				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, attack);
-				else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, attack);
-				else if(distance < range) BaseLevel.attackMob(lane, attack);
+				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
+				else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, damage);
+				else if(distance < range) BaseLevel.attackMob(lane, damage);
 			}
 			else if(distance == 1) {
-				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, attack);
-				else if(distance < range) BaseLevel.attackMob(lane, attack);
+				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
+				else if(distance < range) BaseLevel.attackMob(lane, damage);
 			}
-			else if(distance < range) BaseLevel.attackMob(lane, attack);
+			else if(distance < range) BaseLevel.attackMob(lane, damage);
 		}
 	}
 	

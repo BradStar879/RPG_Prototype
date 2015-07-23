@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 
 public class Spearman extends BaseCharacter{
+	
+	int energyCount = 0;
 
 	public Spearman(int num, int pos, Color col, String name, int level,
 			int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor, 
@@ -15,20 +17,28 @@ public class Spearman extends BaseCharacter{
 	
 	public void init() {
 		super.init();
+		mp = maxMp;
 		className = "Spearman";
 		range = 2;
-		moveSet[0] =  "Attack";
-		moveSet[1] = "Stretch";
-		moveSet[2] = "";
+		moveSet[0] = "Attack";
+		moveSet[1] = "Energy Attack";
+		moveSet[2] = "Stretch";
 		moveSet[3] = "Item";
+		
 	}
 	
 	public void tick() {
 		super.tick();
-		if(moveCooldown[1] > 0) {
-			moveCooldown[1]--;
-			if(moveCooldown[1] > 900) range = 3;
+		if(moveCooldown[2] > 0) {
+			moveCooldown[2]--;
+			if(moveCooldown[2] > 2400) range = 3;
 			else range = 2;
+		}
+		
+		energyCount++;
+		if(energyCount == 120) {
+			energyCount = 0;
+			if(mp != maxMp) mp++;
 		}
 	}
 	
@@ -65,10 +75,10 @@ public class Spearman extends BaseCharacter{
 			if(k == KeyEvent.VK_DOWN) BaseLevel.changeMenuSelect("DOWN");
 			if(k == KeyEvent.VK_RIGHT) {
 				if(BaseLevel.getMenuOption().equals("Attack")) {
-					attack();
+					attack(attack);
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Stretch") && !isMoveOnCooldown[1]) {
+				else if(BaseLevel.getMenuOption().equals("Stretch") && !isMoveOnCooldown[1] && mp >= 20) {
 					stretch();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
@@ -92,8 +102,9 @@ public class Spearman extends BaseCharacter{
 	
 	public void stretch() {
 		time = 0;
-		moveCooldown[1] = 1800;
-		isMoveOnCooldown[1] = true;
+		mp -= 20;
+		moveCooldown[2] = 3600;
+		isMoveOnCooldown[2] = true;
 		attacking = false;
 		queued = false;
 		BaseLevel.dequeueTurn();

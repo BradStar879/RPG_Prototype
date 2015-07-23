@@ -61,7 +61,7 @@ public class Saver implements Serializable{
 				team[0] = (CharacterStats) inputStream.readObject();
 				ObjectInputStream inputStream2 = new ObjectInputStream(new BufferedInputStream(new FileInputStream("Save/Char2.dat")));
 				team[1] = (CharacterStats) inputStream2.readObject();
-				ObjectInputStream inputStream3 = new ObjectInputStream(new BufferedInputStream(new FileInputStream("Save/Char2.dat")));
+				ObjectInputStream inputStream3 = new ObjectInputStream(new BufferedInputStream(new FileInputStream("Save/Char3.dat")));
 				team[2] = (CharacterStats) inputStream3.readObject();
 				ObjectInputStream inputStream4 = new ObjectInputStream(new BufferedInputStream(new FileInputStream("Save/Pos.dat")));
 				position = (PlayerMover) inputStream4.readObject();

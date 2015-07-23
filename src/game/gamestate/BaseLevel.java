@@ -85,7 +85,8 @@ public class BaseLevel extends GameState{
 	int itemsWonChance;
 	String[] possibleItems;
 	static String[] itemsWon;
-	int xp;
+	static int currencyWon;
+	static int xp;
 	
 	
 	public BaseLevel(GameStateManager gsm) {
@@ -127,48 +128,48 @@ public class BaseLevel extends GameState{
 		test = new CoordinateTester(400, 400);
 		
 		if(team[0].className.equals("Warrior")) char1 = new Warrior(0, 3, Color.RED, team[0].name, team[0].level, team[0].hp, 
-				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].baseSpellAttack);
+				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].spellPower);
 		else if(team[0].className.equals("Black Mage")) char1 = new BlackMage(0, 3, Color.RED, team[0].name, team[0].level, team[0].hp,
-				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].baseSpellAttack);
+				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].spellPower);
 		else if(team[0].className.equals("White Mage")) char1 = new WhiteMage(0, 3, Color.RED, team[0].name, team[0].level, team[0].hp, 
-				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].baseSpellAttack);
+				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].spellPower);
 		else if(team[0].className.equals("Archer")) char1 = new Archer(0, 3, Color.RED, team[0].name, team[0].level, team[0].hp,
-				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].baseSpellAttack);
+				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].spellPower);
 		else if(team[0].className.equals("Spearman")) char1 = new Spearman(0, 3, Color.RED, team[0].name, team[0].level, team[0].hp, 
-				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].baseSpellAttack);
+				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].spellPower);
 		else if(team[0].className.equals("Monk")) char1 = new Monk(0, 3, Color.RED, team[0].name, team[0].level, team[0].hp,
-				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].baseSpellAttack);
+				team[0].maxHp, team[0].mp, team[0].maxMp, team[0].speed, team[0].attack, team[0].armor, team[0].spellPower);
 			
 		if(team[1].className.equals("Warrior")) char2 = new Warrior(1, 4, Color.CYAN, team[1].name, team[1].level, team[1].hp, 
-				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].baseSpellAttack);
+				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].spellPower);
 		else if(team[1].className.equals("Black Mage")) char2 = new BlackMage(1, 4, Color.CYAN, team[1].name, team[1].level, team[1].hp,
-				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].baseSpellAttack);
+				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].spellPower);
 		else if(team[1].className.equals("White Mage")) char2 = new WhiteMage(1, 4, Color.CYAN, team[1].name, team[1].level, team[1].hp,
-				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].baseSpellAttack);
+				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].spellPower);
 		else if(team[1].className.equals("Archer")) char2 = new Archer(1, 4, Color.CYAN, team[1].name, team[1].level, team[1].hp,
-				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].baseSpellAttack);
+				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].spellPower);
 		else if(team[1].className.equals("Spearman")) char2 = new Spearman(1, 4, Color.CYAN, team[1].name, team[1].level, team[1].hp,
-				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].baseSpellAttack);
+				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].spellPower);
 		else if(team[1].className.equals("Monk")) char2 = new Monk(1, 4, Color.CYAN, team[1].name, team[1].level, team[1].hp, 
-				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].baseSpellAttack);
+				team[1].maxHp, team[1].mp, team[1].maxMp, team[1].speed, team[1].attack, team[1].armor, team[1].spellPower);
 		
 		if(team[2].className.equals("Warrior")) char3 = new Warrior(2, 5, Color.MAGENTA, team[2].name, team[2].level, team[2].hp,
-				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].baseSpellAttack);
+				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].spellPower);
 		else if(team[2].className.equals("Black Mage")) char3 = new BlackMage(2, 5, Color.MAGENTA, team[2].name, team[2].level, team[2].hp,
-				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].baseSpellAttack);
+				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].spellPower);
 		else if(team[2].className.equals("White Mage")) char3 = new WhiteMage(2, 5, Color.MAGENTA, team[2].name, team[2].level, team[2].hp,
-				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].baseSpellAttack);
+				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].spellPower);
 		else if(team[2].className.equals("Archer")) char3 = new Archer(2, 5, Color.MAGENTA, team[2].name, team[2].level, team[2].hp,
-				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].baseSpellAttack);
+				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].spellPower);
 		else if(team[2].className.equals("Spearman")) char3 = new Spearman(2, 5, Color.MAGENTA, team[2].name, team[2].level, team[2].hp,
-				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].baseSpellAttack);
+				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].spellPower);
 		else if(team[2].className.equals("Monk")) char3 = new Monk(2, 5, Color.MAGENTA, team[2].name, team[2].level, team[2].hp,
-				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].baseSpellAttack);
+				team[2].maxHp, team[2].mp, team[2].maxMp, team[2].speed, team[2].attack, team[2].armor, team[2].spellPower);
 		
 		chars = new BaseCharacter[]{char1, char2, char3};
-		mob1 = new BaseMob(0, 1, 50, 120, 10);
-		mob2 = new BaseMob(1, 1, 50, 120, 8);
-		mob3 = new BaseMob(2, 1, 50, 120, 5);
+		mob1 = new BaseMob(0, 100, 25, 120, 100);
+		mob2 = new BaseMob(1, 100, 25, 120, 100);
+		mob3 = new BaseMob(2, 100, 25, 120, 100);
 		
 		topInfo = new InfoDisplay(char1, 0);
 		midInfo = new InfoDisplay(char2, 1);
@@ -177,18 +178,19 @@ public class BaseLevel extends GameState{
 		pDisplay = new PauseDisplay();
 		
 		xp = 100;
+		currencyWon = (int)(Math.random() * 16 + 10);
 		itemsWonChance = (int)(Math.random() * 10);
 		if(itemsWonChance < 3) numItemsWon = 0;
 		else if(itemsWonChance < 6) numItemsWon = 1;
 		else if(itemsWonChance < 9) numItemsWon = 2;
 		else numItemsWon = 3;
 		itemsWon = new String[numItemsWon];
-		possibleItems = new String[]{"Potion", "String", "Ring"};
+		possibleItems = new String[]{"Potion", "String", "Fire Arrow"};
 		while(numItemsWon > 0) {
 			itemsWon[numItemsWon-1] = possibleItems[(int)(Math.random() * possibleItems.length)];
 			numItemsWon--;
 		}
-		wScreen = new WinScreen(xp, itemsWon);
+		wScreen = new WinScreen(xp, currencyWon, itemsWon);
 		
 		grid = new Grid(wd, gridX, gridY);
 		mob = new BaseMob[]{mob1, mob2, mob3};
@@ -235,7 +237,7 @@ public class BaseLevel extends GameState{
 			wScreen.won = true;
 			wScreen.tick();
 			if(!experienceRewarded) {
-				saveStats(xp);
+				saveStats();
 				experienceRewarded = true;
 			}
 			if(team[0].experience >= team[0].level * 500) team[0].levelUp();
@@ -366,10 +368,15 @@ public class BaseLevel extends GameState{
 		qDisplay.dequeue();
 	}
 
-	public static void attackMob(int lane, int attack) {
+	public static boolean attackMob(int lane, int attack) {
 		if(mobInLane[lane]) {
-			if(mob[lane].takeDamage(attack)) mobInLane[lane] = false;
+			if(mob[lane].takeDamage(attack)) {
+				mobInLane[lane] = false;
+				return true;
+			}
+			return false;
 		}
+		return false;
 	}
 	
 	public static void attackMob(int lane, int attack, String elem) {
@@ -445,17 +452,18 @@ public class BaseLevel extends GameState{
 		exit = true;
 	}
 	
-	public static void saveStats(int xp) {
+	public static void saveStats() {
 		for(int i = 0; i < 3; i++) {
 			team[i].experience += xp;
 			team[i].hp = chars[i].getHp();
 			team[i].mp = chars[i].getMp();
 			if(team[i].experience >= team[i].experienceCap) {
-				team[i].experience -= team[i].experienceCap;
 				team[i].levelUp();
+				WinScreen.leveled[i] = true;
 			}
 			team[i] = World.team[i];
 		}
 		for(int i = 0; i < itemsWon.length; i++) World.inv.addItem(itemsWon[i]);
+		World.inv.addCurrency(currencyWon);
 	}
 }

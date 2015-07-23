@@ -51,7 +51,22 @@ public class InfoDisplay {
 			g.drawString("DEAD", border * 2, factor * (ht / 3) + 47 * border / 4);
 			g.setColor(Color.WHITE);
 		}
-		g.drawString("MP: " + 	c.getMp() + "/" + c.getMaxMp(), border * 2, factor * (ht / 3) + 61 * border / 4);
+		if(c.className.equals("Black Mage") || c.className.equals("White Mage")) {
+			g.drawString("MP: " + 	c.getMp() + "/" + c.getMaxMp(), border * 2, factor * (ht / 3) + 61 * border / 4);
+			g.drawImage(purple, border * 2, factor * (ht / 3) + border * 63 / 4, (wd / 8 + border) * c.getMp() / c.getMaxMp(), border, null);
+		}
+		else if(c.className.equals("Warrior")) {
+			g.drawString("Rage: " + 	c.getMp() + "/" + c.getMaxMp(), border * 2, factor * (ht / 3) + 61 * border / 4);
+			g.drawImage(red, border * 2, factor * (ht / 3) + border * 63 / 4, (wd / 8 + border) * c.getMp() / c.getMaxMp(), border, null);
+		}
+		else if(c.className.equals("Spearman")) {
+			g.drawString("Energy: " + 	c.getMp() + "/" + c.getMaxMp(), border * 2, factor * (ht / 3) + 61 * border / 4);
+			g.drawImage(yellow, border * 2, factor * (ht / 3) + border * 63 / 4, (wd / 8 + border) * c.getMp() / c.getMaxMp(), border, null);
+		}
+		else if(c.className.equals("Monk")) {
+			g.drawString("Charms: " + 	c.getMp() + "/" + c.getMaxMp(), border * 2, factor * (ht / 3) + 61 * border / 4);
+			g.drawImage(green, border * 2, factor * (ht / 3) + border * 63 / 4, (wd / 8 + border) * c.getMp() / c.getMaxMp(), border, null);
+		}
 		g.drawString("Time: ", border * 2, factor * (ht / 3) + 75 * border / 4);
 		
 		if((double)c.getHp() / (double)c.getMaxHp() >= .75) health = green;
@@ -59,7 +74,6 @@ public class InfoDisplay {
 		else if((double)c.getHp() / (double)c.getMaxHp() >= .25) health = orange;
 		else health = red;
 		g.drawImage(health, border * 2, factor * (ht / 3) + border * 197 / 16, (wd / 8 + border) * c.getHp() / c.getMaxHp(), border,  null);
-		if(c.getMaxMp() > 0) g.drawImage(purple, border * 2, factor * (ht / 3) + border * 63 / 4, (wd / 8 + border) * c.getMp() / c.getMaxMp(), border, null);
 		g.drawImage(cyan, border * 2, factor * (ht / 3) + border * 309 / 16, (wd / 8 + border) * c.getTime() / c.getTimeMax(), border, null);
 		
 		

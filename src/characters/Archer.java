@@ -1,22 +1,21 @@
 package characters;
 
 import game.gamestate.BaseLevel;
+import game.gamestate.World;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
 public class Archer extends BaseCharacter{
 	
-	int speedBooster;
 	int speedBoostDuration;
 	int critChance;
-	int baseAttack;
 	int critAttack;
+	int numFireArrows;
 
 	public Archer(int num, int pos, Color col, String name, int level, int hp,
 			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack) {
 		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack);
-		this.baseAttack = attack;
 		this.critAttack = (int)(attack * 2.2);
 	}
 	
@@ -25,9 +24,9 @@ public class Archer extends BaseCharacter{
 		className = "Archer";
 		range = 3;
 		critChance = 10;
-		moveSet[0] =  "Attack";
-		moveSet[1] = "Speed Up";
-		moveSet[2] = "";
+		moveSet[0] = "Attack";
+		moveSet[1] = "Spec. Arrow";
+		moveSet[2] = "Speed Up";
 		moveSet[3] = "Item";
 		
 		isMoveOnCooldown[0] = false;
@@ -35,22 +34,26 @@ public class Archer extends BaseCharacter{
 		isMoveOnCooldown[2] = false;
 		isMoveOnCooldown[3] = false;
 		
+		spellSet[0] = "Fire Arrow";
+		
 		speedBoostDuration = 0;
 		baseSpeed = speed;
-		speedBooster = 8;
 	}
 	
 	public void tick() {
 		super.tick();
-		if(moveCooldown[1] > 0) {
-			moveCooldown[1]--;
+		if(moveCooldown[2] > 0) {
+			moveCooldown[2]--;
 		}
-		else isMoveOnCooldown[1] = false;
+		else isMoveOnCooldown[2] = false;
 		if(speedBoostDuration > 0) {
-			speed = baseSpeed + speedBooster;
+			speed = baseSpeed + spellPower * 5;
 			speedBoostDuration--;
 		}
 		else speed = baseSpeed;
+		
+		numFireArrows = World.inv.checkItem("Fire Arrow");
+		if(numFireArrows == 0) isSpellOnCooldown[0] = true;
 	}
 	
 	public void keyPressed(int k) {
@@ -87,17 +90,26 @@ public class Archer extends BaseCharacter{
 			if(k == KeyEvent.VK_RIGHT) {
 				if(BaseLevel.getMenuOption().equals("Attack")) {
 					time = 0;
-					if(Math.random() * 100 < critChance) {
-						attack = critAttack;
-						attack();
-						attack = baseAttack;
-					}
-					else attack();
+					if(Math.random() * 100 < critChance) attack(critAttack);
+					else attack(attack);
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
+				else if(BaseLevel.getMenuOption().equals("Spec. Arrow")) {
+					BaseLevel.changeMenuOptions(spellSet[0], spellSet[1], spellSet[2], spellSet[3], 
+							isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
+					baseMenu = false;
+					spellMenu = true;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("Speed Up") && !isMoveOnCooldown[1]) {
 					time = 0;
 					speedUp();
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
+				else if(BaseLevel.getMenuOption().equals("Fire Arrow") && !isSpellOnCooldown[0]) {
+					time = 0;
+					spellMenu = false;
+					fireArrow();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 			}
@@ -119,10 +131,24 @@ public class Archer extends BaseCharacter{
 	
 	public void speedUp() {
 		speedBoostDuration = 1200;
-		moveCooldown[1] = 1800;
-		isMoveOnCooldown[1] = true;
+		moveCooldown[2] = 1800;
+		isMoveOnCooldown[2] = true;
 		attacking = false;
 		queued = false;
 		BaseLevel.dequeueTurn();
+	}
+	
+	public void fireArrow() {
+		attacking = false;
+		queued = false;
+		attack((int)(attack * 1.5));
+		World.inv.removeItem("Fire Arrow");
+	}
+	
+	public void poisonArrow() {
+		attacking = false;
+		queued = false;
+		attack(attack);
+		World.inv.removeItem("Poison Arrow");
 	}
 }

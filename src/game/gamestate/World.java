@@ -7,44 +7,46 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-
 import player.CharacterStats;
 import player.Inventory;
 import player.PlayerMover;
 import world.BaseWorldBlock;
 import world.GrassBlock;
 import world.WaterBlock;
+import Cities.CastleWall;
+import Cities.Gravel;
+import Cities.StartingCity;
 import display.Animations;
 import display.BufferedImageLoader;
 import display.WorldPauseDisplay;
 
 public class World extends GameState{
 	
-	int shiftX;
-	int shiftY;
+	public int shiftX;
+	public int shiftY;
 	int dir;
-	int speed;
+	public int speed;
 	int temp;
 	boolean moving;
 	int moveTime;
-	int blockSize;
-	int wd;
-	int ht;
-	int battleProb;
+	public int blockSize;
+	public int wd;
+	public int ht;
+	public int battleProb;
 	public static boolean loading = false;
 	boolean battle;
 	static boolean paused;
 	static boolean exit;
-	BaseWorldBlock[][] world;
+	public BaseWorldBlock[][] world;
 	public static PlayerMover player;
 	public static PlayerMover loadedPlayer;
 	public static CharacterStats[] team;
 	public static Inventory inv;
 	
-	BufferedImageLoader loader;
-	private BufferedImage worldDrawn = null;
-	int worldLength;
-	int worldHeight;
+	public BufferedImageLoader loader;
+	public BufferedImage worldDrawn = null;
+	public int worldLength;
+	public int worldHeight;
 	
 	public WorldPauseDisplay pDisplay;
 
@@ -55,7 +57,6 @@ public class World extends GameState{
 
 	
 	public void init() {
-		
 		
 		wd = GamePanel.WIDTH;
 		ht = GamePanel.HEIGHT;
@@ -85,7 +86,9 @@ public class World extends GameState{
 		world = new BaseWorldBlock[worldHeight][worldLength];
 		loadImageLevel(worldDrawn);
 		pDisplay = new WorldPauseDisplay();
-		
+		inv.addItem("Fire Arrow");
+		inv.addItem("Fire Arrow");
+		inv.addItem("Fire Arrow");
 		
 	}
 
@@ -225,6 +228,7 @@ public class World extends GameState{
 				player.steps++;
 			}
 			else if(k == KeyEvent.VK_Q) battle = true;
+			else if(k == KeyEvent.VK_E) enterCity();
 		}
 		if(k == KeyEvent.VK_ESCAPE && !battle && !paused) {
 			paused = true;
@@ -241,7 +245,7 @@ public class World extends GameState{
 		
 	}
 	
-	private void loadImageLevel(BufferedImage image) {
+	public void loadImageLevel(BufferedImage image) {
 		
 		int w = image.getWidth();
 		int h = image.getHeight();
@@ -256,8 +260,14 @@ public class World extends GameState{
 				
 				if(b == 255) world[i][j] = new WaterBlock(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 				else if(g == 255) world[i][j] = new GrassBlock(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
+				else if(g == 195) world[i][j] = new Gravel(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
+				else if(g == 73) world[i][j] = new CastleWall(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 			}
 		
+	}
+	
+	public void enterCity() {
+		gsm.states.push(new StartingCity(gsm));
 	}
 	
 	public void battleChance() {

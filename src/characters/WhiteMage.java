@@ -3,7 +3,10 @@ package characters;
 import game.gamestate.BaseLevel;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
 
 public class WhiteMage extends BaseCharacter {
 
@@ -19,14 +22,16 @@ public class WhiteMage extends BaseCharacter {
 		super.init();
 		className = "White Mage";
 		range = 3;
-		moveSet[0] =  "Attack";
+		sprite = new ImageIcon("Sprites/WhiteMage.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
+		moveSet[0] = "Attack";
 		moveSet[1] = "White Magic";
-		moveSet[2] = "";
+		moveSet[2] = "Rejuvinate";
 		moveSet[3] = "Item";
 		
 		spellSet[0] = "Heal";
-		spellSet[1] = "Mega Heal";
-		spellSet[2] = "Regen";
+		spellSet[1] = "Self Heal";
+		spellSet[2] = "Mega Heal";
+		spellSet[3] = "Regen";
 
 	}
 	
@@ -47,11 +52,11 @@ public class WhiteMage extends BaseCharacter {
 		
 		if(spellCooldown[2] > 0) {
 			spellCooldown[2]--;
-			if(spellCooldown[2] % 180 == 0 && regenTarget != null) regenTarget.heal(40);
+			if(spellCooldown[2] % 180 == 0 && regenTarget != null) regenTarget.heal(spellPower / 4);
 		}
 		else isSpellOnCooldown[2] = false;
 		
-		if(distance == 2) speed = baseSpeed + 10;
+		if(distance == 2) speed = baseSpeed + 15;
 		else speed = baseSpeed;
 	}
 	
@@ -96,6 +101,10 @@ public class WhiteMage extends BaseCharacter {
 							isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
 					baseMenu = false;
 					spellMenu = true;
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
+				else if(BaseLevel.getMenuOption().equals("Rejuvinate")) {
+					rejuvinate();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("Heal") && !isSpellOnCooldown[0] && mp > 10) {
@@ -158,6 +167,15 @@ public class WhiteMage extends BaseCharacter {
 		}
 	}
 	
+	public void rejuvinate() {
+		time = 0;
+		attacking = false;
+		queued = false;
+		mp += 10;
+		if(mp > maxMp) mp = maxMp;
+		BaseLevel.dequeueTurn();
+	}
+	
 	public void healMove() {
 		time = 0;
 		mp -= 10;
@@ -167,12 +185,23 @@ public class WhiteMage extends BaseCharacter {
 		queued = false;
 		BaseLevel.dequeueTurn();
 		if(distance == 2) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).heal(100);
-			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.getCharAt(pos - 6).heal(100);
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).heal(spellPower);
+			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.getCharAt(pos - 6).heal(spellPower);
 		}
 		else if(distance == 1) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).heal(100);
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).heal(spellPower);
 		}
+	}
+	
+	public void selfHeal() {
+		time = 0;
+		mp -= 10;
+		spellCooldown[0] = 1800;
+		isSpellOnCooldown[0] = true;
+		attacking = false;
+		queued = false;
+		BaseLevel.dequeueTurn();
+		heal(spellPower);
 	}
 	
 	public void megaHeal() {
@@ -184,17 +213,17 @@ public class WhiteMage extends BaseCharacter {
 		queued = false;
 		BaseLevel.dequeueTurn();
 		if(distance == 2) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).heal(300);
-			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.getCharAt(pos - 6).heal(300);
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).heal(spellPower * 2);
+			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.getCharAt(pos - 6).heal(spellPower * 2);
 		}
 		else if(distance == 1) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).heal(300);
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).heal(spellPower * 2);
 		}
 	}
 	
 	public void regen() {
 		time = 0;
-		mp -= 15;
+		mp -= 10;
 		spellCooldown[2] = 1200;
 		isSpellOnCooldown[2] = true;
 		attacking = false;

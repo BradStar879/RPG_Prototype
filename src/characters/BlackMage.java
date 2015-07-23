@@ -3,23 +3,27 @@ package characters;
 import game.gamestate.BaseLevel;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
 
 public class BlackMage extends BaseCharacter{
 
 	public BlackMage(int num, int pos, Color col, String name, int level,
 			int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor,
-			int baseSpellAttack) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack);
+			int spellPower) {
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, spellPower);
 	}
 	
 	public void init() {
 		super.init();
 		className = "Black Mage";
 		range = 3;
-		moveSet[0] =  "Attack";
-		moveSet[1] = "Magic";
-		moveSet[2] = "Dark Magic";
+		sprite = new ImageIcon("Sprites/BlackMage.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
+		moveSet[0] = "Attack";
+		moveSet[1] = "Black Magic";
+		moveSet[2] = "Rejuvinate";
 		moveSet[3] = "Item";
 		
 		spellSet[0] = "Fire";
@@ -48,7 +52,7 @@ public class BlackMage extends BaseCharacter{
 		}
 		else isSpellOnCooldown[2] = false;
 		
-		if(distance == 2) speed = baseSpeed + 10;
+		if(distance == 2) speed = baseSpeed + 15;
 		else speed = baseSpeed;
 	}
 	
@@ -87,32 +91,33 @@ public class BlackMage extends BaseCharacter{
 			if(k == KeyEvent.VK_DOWN) BaseLevel.changeMenuSelect("DOWN");
 			if(k == KeyEvent.VK_RIGHT) {
 				if(BaseLevel.getMenuOption().equals("Attack")) {
-					attack();
+					attack(attack);
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Magic")) {
+				else if(BaseLevel.getMenuOption().equals("Black Magic")) {
 					BaseLevel.changeMenuOptions(spellSet[0], spellSet[1], spellSet[2], spellSet[3], 
 							isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
 					baseMenu = false;
 					spellMenu = true;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
+				else if(BaseLevel.getMenuOption().equals("Rejuvinate")) {
+					rejuvinate();
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
 				else if(BaseLevel.getMenuOption().equals("Fire") && !isSpellOnCooldown[0] && mp >= 20) {
 					fire();
 					spellMenu = false;
-					mp -= 20;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("Ice") && !isSpellOnCooldown[1] && mp >= 20) {
 					ice();
 					spellMenu = false;
-					mp -= 20;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("Lightning") && !isSpellOnCooldown[2] && mp >= 20) {
 					lightning();
 					spellMenu = false;
-					mp -= 20;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 			}
@@ -133,25 +138,23 @@ public class BlackMage extends BaseCharacter{
 		}
 	}
 	
+	public void rejuvinate() {
+		time = 0;
+		attacking = false;
+		queued = false;
+		mp += 10;
+		if(mp > maxMp) mp = maxMp;
+		BaseLevel.dequeueTurn();
+	}
+	
 	public void fire() {
 		time = 0;
 		spellCooldown[0] = 1800;
 		isSpellOnCooldown[0] = true;
 		attacking = false;
 		queued = false;
-		BaseLevel.dequeueTurn();
-		if(distance == 2) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
-			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, baseSpellAttack);
-			else BaseLevel.attackMob(lane, baseSpellAttack, "Fire");
-		}
-		else if(distance == 1) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
-			else BaseLevel.attackMob(lane, baseSpellAttack, "Fire");
-		}
-		else {
-			BaseLevel.attackMob(lane, baseSpellAttack, "Fire");
-		}
+		mp -= 20;;
+		attack(spellPower);
 	}
 	
 	public void ice() {
@@ -160,19 +163,8 @@ public class BlackMage extends BaseCharacter{
 		isSpellOnCooldown[1] = true;
 		attacking = false;
 		queued = false;
-		BaseLevel.dequeueTurn();
-		if(distance == 2) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
-			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, baseSpellAttack);
-			else BaseLevel.attackMob(lane, baseSpellAttack, "Ice");
-		}
-		else if(distance == 1) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
-			else BaseLevel.attackMob(lane, baseSpellAttack, "Ice");
-		}
-		else {
-			BaseLevel.attackMob(lane, baseSpellAttack, "Ice");
-		}
+		mp -= 20;
+		attack(spellPower);
 	}
 	
 	public void lightning() {
@@ -181,19 +173,8 @@ public class BlackMage extends BaseCharacter{
 		isSpellOnCooldown[2] = true;
 		attacking = false;
 		queued = false;
-		BaseLevel.dequeueTurn();
-		if(distance == 2) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
-			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, baseSpellAttack);
-			else BaseLevel.attackMob(lane, baseSpellAttack, "Lightning");
-		}
-		else if(distance == 1) {
-			if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, baseSpellAttack);
-			else BaseLevel.attackMob(lane, baseSpellAttack, "Lightning");
-		}
-		else {
-			BaseLevel.attackMob(lane, baseSpellAttack, "Lightning");
-		}
+		mp -= 20;
+		attack(spellPower);
 	}
 
 }
