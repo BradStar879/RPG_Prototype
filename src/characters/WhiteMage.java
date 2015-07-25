@@ -107,17 +107,22 @@ public class WhiteMage extends BaseCharacter {
 					rejuvinate();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Heal") && !isSpellOnCooldown[0] && mp > 10) {
+				else if(BaseLevel.getMenuOption().equals("Heal") && !isSpellOnCooldown[0] && mp >= 10) {
 					healMove();
 					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Mega Heal") && !isSpellOnCooldown[1] && mp > 30) {
+				else if(BaseLevel.getMenuOption().equals("Self Heal") && !isSpellOnCooldown[1] && mp >= 10) {
+					selfHeal();
+					spellMenu = false;
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
+				else if(BaseLevel.getMenuOption().equals("Mega Heal") && !isSpellOnCooldown[1] && mp >= 30) {
 					megaHeal();
 					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Regen") && !isSpellOnCooldown[2] && mp > 15) {
+				else if(BaseLevel.getMenuOption().equals("Regen") && !isSpellOnCooldown[2] && mp >= 10) {
 					regen();
 					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
@@ -196,8 +201,8 @@ public class WhiteMage extends BaseCharacter {
 	public void selfHeal() {
 		time = 0;
 		mp -= 10;
-		spellCooldown[0] = 1800;
-		isSpellOnCooldown[0] = true;
+		spellCooldown[1] = 1800;
+		isSpellOnCooldown[1] = true;
 		attacking = false;
 		queued = false;
 		BaseLevel.dequeueTurn();
@@ -207,8 +212,8 @@ public class WhiteMage extends BaseCharacter {
 	public void megaHeal() {
 		time = 0;
 		mp -= 30;
-		spellCooldown[1] = 3600;
-		isSpellOnCooldown[1] = true;
+		spellCooldown[2] = 3600;
+		isSpellOnCooldown[2] = true;
 		attacking = false;
 		queued = false;
 		BaseLevel.dequeueTurn();
@@ -224,8 +229,8 @@ public class WhiteMage extends BaseCharacter {
 	public void regen() {
 		time = 0;
 		mp -= 10;
-		spellCooldown[2] = 1200;
-		isSpellOnCooldown[2] = true;
+		spellCooldown[3] = 1200;
+		isSpellOnCooldown[3] = true;
 		attacking = false;
 		queued = false;
 		BaseLevel.dequeueTurn();

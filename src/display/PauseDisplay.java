@@ -60,7 +60,10 @@ public class PauseDisplay {
 					BaseLevel.unpause();
 				}
 				else if(pauseSelect == 1) ;
-				else if(pauseSelect == 2) BaseLevel.exit();
+				else if(pauseSelect == 2) {
+					
+					BaseLevel.exit();
+				}
 			}
 		}
 	}

@@ -3,7 +3,10 @@ package characters;
 import game.gamestate.BaseLevel;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
 
 public class Warrior extends BaseCharacter{
 	
@@ -17,6 +20,7 @@ public class Warrior extends BaseCharacter{
 	
 	public void init() {
 		super.init();
+		sprite = new ImageIcon("Sprites/Warrior.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
 		mp = 0;
 		className = "Warrior";
 		range = 1;

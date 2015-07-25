@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 
 import player.CharacterStats;
+import player.Item;
 import player.Saver;
 
 public class WorldPauseDisplay {
@@ -22,7 +23,8 @@ public class WorldPauseDisplay {
 	int pauseWd = wd / 4;
 	int pauseHt = ht / 6;
 	int saveTick = 0;
-	boolean subMenu = false;
+	boolean invMenu = false;
+	boolean invCharMenu = false;
 	boolean saved = false;
 	BufferedImageLoader loader = new BufferedImageLoader();
 	Image sideArrow = loader.loadImage("/SideArrow.png").getScaledInstance(border * 4, border * 2, Image.SCALE_SMOOTH);
@@ -39,9 +41,11 @@ public class WorldPauseDisplay {
 	String[] pauseOptions = new String[]{"Resume", "Inventory", "Save", "Quit"};
 	int pauseSelect = 0;
 	int invSelect = 0;
+	int invCharSelect = 0;
 	String[] invList;
 	int[] invAmts;
 	int currency;
+	String item;
 	public static CharacterStats team[];
 	
 	Saver saver = new Saver();
@@ -71,9 +75,23 @@ public class WorldPauseDisplay {
 				else health = red;
 				g.drawImage(black, wd / 6 - border / 2, ht / 10 + (i * ht / 3) + border * 7 - border / 4, wd / 8 + border, border * 3 / 2, null);
 				g.drawImage(health, wd / 6, ht / 10 + (i * ht / 3) + border * 7, (wd / 8) * team[i].hp / team[i].maxHp, border,  null);
-				g.drawString("MP: " + team[i].mp + " / " + team[i].maxMp, wd / 6, ht / 10 + (i * ht / 3) + border * 10);
 				g.drawImage(black, wd / 6 - border / 2, ht / 10 + (i * ht / 3) + border * 11 - border / 4, wd / 8 + border, border * 3 / 2, null);
-				if(team[i].mp > 0) g.drawImage(purple, wd / 6, ht / 10 + (i * ht / 3) + border * 11, (wd / 8) * team[i].mp / team[i].maxMp, border, null);
+				if(team[i].className.equals("Black Mage") || team[i].className.equals("White Mage")) {
+					g.drawString("MP: " + 	team[i].mp + "/" + team[i].maxMp, wd / 6, i * (ht / 3) + ht / 4 + border * 3 / 8);
+					g.drawImage(purple, wd / 6, ht / 10 + (i * ht / 3) + border * 11, (wd / 8) * team[i].mp / team[i].maxMp, border, null);
+				}
+				else if(team[i].className.equals("Warrior")) {
+					g.drawString("Rage: " + 	team[i].mp + "/" + team[i].maxMp, wd / 6, i * (ht / 3) + ht / 4 + border * 3 / 8);
+					g.drawImage(red, wd / 6, ht / 10 + (i * ht / 3) + border * 11, (wd / 8) * team[i].mp / team[i].maxMp, border, null);
+				}
+				else if(team[i].className.equals("Spearman")) {
+					g.drawString("Energy: " + 	team[i].mp + "/" + team[i].maxMp, wd / 6, i * (ht / 3) + ht / 4 + border * 3 / 8);
+					g.drawImage(yellow, wd / 6, ht / 10 + (i * ht / 3) + border * 11, (wd / 8) * team[i].mp / team[i].maxMp, border, null);
+				}
+				else if(team[i].className.equals("Monk")) {
+					g.drawString("Charms: " + 	team[i].mp + "/" + team[i].maxMp, wd / 6, i * (ht / 3) + ht / 4 + border * 3 / 8);
+					g.drawImage(green,wd / 6, ht / 10 + (i * ht / 3) + border * 11, (wd / 8) * team[i].mp / team[i].maxMp, border, null);
+				}
 				g.drawString("Attack: " + team[i].attack, wd / 3, ht / 10 + (i * ht / 3));
 				g.drawString("Spell Power: " + team[i].spellPower, wd / 3, ht / 10 + (i * ht / 3) + border * 3);
 				g.drawString("Armor: " + team[i].armor, wd / 3, ht / 10 + (i * ht / 3) + border * 6);
@@ -83,7 +101,22 @@ public class WorldPauseDisplay {
 				g.drawImage(yellow, wd / 2 + 7 * border, ht / 5 + (i * ht / 3) + border * 29 / 8, (wd / 8 + border) * team[i].experience / team[i].experienceCap, border, null);
 			}
 			
-			if(!subMenu) {
+			if(invMenu || invCharMenu) {
+				
+				invList = World.inv.getItems();
+				invAmts = World.inv.getItemAmounts();
+				g.setColor(Color.WHITE);
+				g.setFont(new Font("pixelmix", Font.PLAIN, ht / 45));
+				for(int i = 0; i < World.inv.size(); i++) {
+					g.drawString(invList[i] + " x " + invAmts[i], wd * 6 / 7, (5 * border) * (i + 1));
+				}
+				g.drawImage(sideArrow, wd * 6 / 7 - 5 * border, (5 * border) * (invSelect + 1) - border * 3 / 2, null);
+				if(invCharMenu) {
+					g.setColor(Color.yellow);
+					g.fillRect(border * 3	, (invCharSelect * ht / 3) + ht / 15, ht / 5, ht / 5);
+				}
+			}
+			else {
 				
 				g.setColor(Color.WHITE);
 				g.setFont(new Font("pixelmix", Font.PLAIN, ht / 45));
@@ -96,15 +129,6 @@ public class WorldPauseDisplay {
 					g.drawString("Game Saved", wd * 6 / 7, 30 * border);
 				}
 			}
-			else if(subMenu) {
-				
-				g.setColor(Color.WHITE);
-				g.setFont(new Font("pixelmix", Font.PLAIN, ht / 45));
-				for(int i = 0; i < World.inv.size(); i++) {
-					g.drawString(invList[i] + " x " + invAmts[i], wd * 6 / 7, (5 * border) * (i + 1));
-				}
-				g.drawImage(sideArrow, wd * 6 / 7 - 5 * border, (5 * border) * (invSelect + 1) - border * 3 / 2, null);
-			}
 		}
 		
 		else 
@@ -114,7 +138,50 @@ public class WorldPauseDisplay {
 	public void keyPressed(int k) {
 		if(paused) {
 			
-			if(!subMenu) {
+			if(invMenu) {
+				if(k == KeyEvent.VK_UP) {
+					if(invSelect <= 0) invSelect = invList.length - 1;
+					else invSelect--;
+					if(invSelect == -1) invSelect = 0;
+				}
+				if(k == KeyEvent.VK_DOWN) {
+					if(invSelect >= invList.length - 1) invSelect = 0;
+					else invSelect++;
+				}
+				if(k == KeyEvent.VK_ENTER) {
+					if(Item.usable(invList[invSelect])) {
+						item = invList[invSelect];
+						invMenu = false;
+						invCharMenu = true;
+					}
+				}
+				if(k == KeyEvent.VK_ESCAPE) {
+					invSelect = 0;
+					invMenu = false;
+				}
+				
+			}
+			else if(invCharMenu) {
+				if(k == KeyEvent.VK_UP) {
+					if(invCharSelect == 0) invCharSelect = 2;
+					else invCharSelect--;
+				}
+				if(k == KeyEvent.VK_DOWN) {
+					if(invCharSelect == 2) invCharSelect = 0;
+					else invCharSelect++;
+				}
+				if(k == KeyEvent.VK_ENTER) {
+					Item.use(team[invCharSelect], item);
+					invMenu = true;
+					invCharMenu = false;
+				}
+				if(k == KeyEvent.VK_ESCAPE) {
+					invCharSelect = 0;
+					invMenu = true;
+					invCharMenu = false;
+				}
+			}
+			else {
 				
 				if(k == KeyEvent.VK_UP) {
 					if(pauseSelect == 0) pauseSelect = pauseOptions.length - 1;
@@ -130,7 +197,7 @@ public class WorldPauseDisplay {
 						World.unpause();
 					}
 					else if(pauseSelect == 1) {
-						subMenu = true;
+						invMenu = true;
 					}
 					else if(pauseSelect == 2) {
 						saver.save(World.team, World.player, World.inv);
@@ -140,26 +207,6 @@ public class WorldPauseDisplay {
 					else if(pauseSelect == 3) World.exit();
 				}
 			}
-			
-			else if(subMenu) {
-				if(k == KeyEvent.VK_UP) {
-					if(invSelect <= 0) invSelect = invList.length - 1;
-					else invSelect--;
-					if(invSelect == -1) invSelect = 0;
-				}
-				if(k == KeyEvent.VK_DOWN) {
-					if(invSelect >= invList.length - 1) invSelect = 0;
-					else invSelect++;
-				}
-				if(k == KeyEvent.VK_ENTER) {
-					
-				}
-				if(k == KeyEvent.VK_ESCAPE) {
-					invSelect = 0;
-					subMenu = false;
-				}
-				
-			}
 		}
 	}
 	
@@ -167,8 +214,6 @@ public class WorldPauseDisplay {
 		pauseSelect = 0;
 		paused = true;
 		team = World.team;
-		invList = World.inv.getItems();
-		invAmts = World.inv.getItemAmounts();
 		currency = World.inv.getCurrency();
 	}
 	

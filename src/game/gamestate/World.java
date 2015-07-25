@@ -53,7 +53,7 @@ public class World extends GameState{
 	public World(GameStateManager gsm) {
 		super(gsm);
 		
-	}
+	}	
 
 	
 	public void init() {
@@ -281,6 +281,7 @@ public class World extends GameState{
 		battle = false;
 		Animations.delay = 0;
 		BaseLevel.team = World.team;
+		for(int i = 0; i < 3; i++) BaseLevel.mobName[i] = "Pig";
 		gsm.states.push(new BaseLevel(gsm));
 	}
 	

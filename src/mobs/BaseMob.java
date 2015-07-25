@@ -5,11 +5,14 @@ import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 
 public class BaseMob {
 	
-	int wd;
-	int ht;
+	int gmWd = GamePanel.WIDTH;
+	int gmHt = GamePanel.HEIGHT;
+	int barWd = gmWd / 36;
+	int barHt = gmHt / 18;
 	
 	int lane;
 	int hp;
@@ -27,6 +30,13 @@ public class BaseMob {
 	String resist;
 	boolean attacking = false;
 	boolean alive = true;
+	Image sprite;
+	public int xp;
+	public String[] items;
+	
+	public BaseMob(int lane) {
+		this.lane = lane;
+	}
 	
 	public BaseMob(int lane, int hp, int attack, int delay, int speed) {
 		this.lane = lane;
@@ -39,12 +49,10 @@ public class BaseMob {
 	}
 	
 	public void init() {
-		wd = GamePanel.HEIGHT / 36;
-		ht = GamePanel.HEIGHT / 18;
 		time = (int)(Math.random() * (speed * 240) - speed * 120);
 		timeMax = 60000;
-		x = BaseLevel.getGridX(1) - (wd / 2) + ((BaseLevel.getGridX(2) - BaseLevel.getGridX(1)) * (lane + 1) / (4));
-		y = BaseLevel.getGridY(1) - ht * 2;
+		x = gmWd / 3 + (gmWd * (1 + 2 * lane) / 18);
+		y = gmHt * 2 / 5;
 	}
 	
 	public void tick() {
@@ -74,13 +82,11 @@ public class BaseMob {
 	public void draw(Graphics g) {
 		if(alive) {
 			g.setColor(Color.BLACK);
-			if(attacking) g.setColor(Color.RED);
-			g.fillRect(x, y, wd, ht);
-			g.drawRect(x, y - (ht / 2), wd, wd / 5);
+			g.drawRect(x - barWd / 2, y - gmHt / 7, barWd, barWd / 5);
 			g.setColor(Color.BLUE);
-			g.fillRect(x, y - (ht / 2), wd * hp / maxHp, wd / 5);
+			g.fillRect(x - barWd / 2, y - gmHt / 7, barWd * hp / maxHp, barWd / 5);
+			g.drawImage(sprite, x - gmHt / 18, y - gmHt / 7, null);
 		}
-		
 	}
 	
 	public void keyPressed(int k) {
@@ -120,8 +126,8 @@ public class BaseMob {
 		BaseLevel.attackChar(attackPos, attack);
 	}
 	
-	public void die() {
-		
+	public String getItem() {
+		return items[(int)(Math.random() * items.length)];
 	}
 
 }

@@ -169,9 +169,33 @@ public class BaseCharacter {
 	public void draw(Graphics g) {
 		if(selected) {
 			g.setColor(Color.YELLOW);
-			if(distance == 0) g.fillRect(this.x - gmHt / 48, this.y - gmHt / 48, gmHt / 12, gmHt / 8);
-			else if(distance == 1) g.fillRect(this.x - gmHt / 48, this.y - gmHt / 48, gmHt / 12, gmHt / 8);
-			else g.fillRect(this.x - gmHt / 48, this.y - gmHt / 48, gmHt / 12, gmHt / 8);
+			if(distance == 0) {
+				for(int i = 0; i < 40; i++) {
+					for(int j = 0; j < 20; j++) {
+						if((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) 
+							g.fillRect(x - gmHt / 36 + (gmHt * j / 9 / 20), y - gmHt / 24 + (gmHt * i / 6 / 40), gmHt / 9 / 20, gmHt / 6 / 40);
+					}
+				}
+				//g.fillRect(x - gmHt / 36, y - gmHt / 24, gmHt / 9, gmHt / 6);
+			}
+			else if(distance == 1) {
+				for(int i = 0; i < 40; i++) {
+					for(int j = 0; j < 20; j++) {
+						if((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) 
+							g.fillRect(x - gmHt / 26 + (int)(gmHt * j / 7.5 / 20), y - gmHt / 12 + (gmHt * i / 5 / 40), (int)(gmHt / 7.5 / 20), (gmHt / 5 / 40));
+					}
+				}
+				//g.fillRect(x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5);
+			}
+			else {
+				for(int i = 0; i < 40; i++) {
+					for(int j = 0; j < 20; j++) {
+						if((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) 
+							g.fillRect(x - gmHt / 19 + (gmHt * j / 6 / 20), y - gmHt / 10 + (gmHt * i / 4 / 40), (gmHt / 6 / 20), (gmHt / 4 / 40));
+					}
+				}
+				//g.fillRect(x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4);
+			}
 		}
 		g.setColor(col);
 		if(pos == 0) {
@@ -211,7 +235,7 @@ public class BaseCharacter {
 			y = rowCoord2;
 		}
 		
-		if(className.equals("White Mage") || className.equals("Black Mage")) {
+		if(className.equals("White Mage") || className.equals("Black Mage") || className.equals("Warrior")) {
 			if(distance == 0) g.drawImage(sprite, x - gmHt / 36, y - gmHt / 24, null);
 			else if(distance == 1) g.drawImage(sprite, x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5, null);
 			else g.drawImage(sprite, x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4, null);
