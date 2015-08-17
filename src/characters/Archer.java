@@ -4,7 +4,10 @@ import game.gamestate.BaseLevel;
 import game.gamestate.World;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
 
 public class Archer extends BaseCharacter{
 	
@@ -22,7 +25,9 @@ public class Archer extends BaseCharacter{
 	public void init() {
 		super.init();
 		className = "Archer";
+		mpName = "Arrows";
 		range = 3;
+		sprite = new ImageIcon("Sprites/Archer.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
 		critChance = 10;
 		moveSet[0] = "Attack";
 		moveSet[1] = "Spec. Arrow";
@@ -46,6 +51,7 @@ public class Archer extends BaseCharacter{
 			moveCooldown[2]--;
 		}
 		else isMoveOnCooldown[2] = false;
+		
 		if(speedBoostDuration > 0) {
 			speed = baseSpeed + spellPower * 5;
 			speedBoostDuration--;

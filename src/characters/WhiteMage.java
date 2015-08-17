@@ -9,8 +9,6 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 
 public class WhiteMage extends BaseCharacter {
-
-	BaseCharacter regenTarget;
 	
 	public WhiteMage(int num, int pos, Color col, String name, int level,
 			int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor, 
@@ -21,6 +19,7 @@ public class WhiteMage extends BaseCharacter {
 	public void init() {
 		super.init();
 		className = "White Mage";
+		mpName = "MP";
 		range = 3;
 		sprite = new ImageIcon("Sprites/WhiteMage.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
 		moveSet[0] = "Attack";
@@ -43,18 +42,26 @@ public class WhiteMage extends BaseCharacter {
 		if(spellCooldown[0] > 0) {
 			spellCooldown[0]--;
 		}
+		else if(mp < 10) isSpellOnCooldown[0] = true;
 		else isSpellOnCooldown[0] = false;
 		
 		if(spellCooldown[1] > 0) {
 			spellCooldown[1]--;
 		}
+		else if(mp < 10) isSpellOnCooldown[1] = true;
 		else isSpellOnCooldown[1] = false;
 		
 		if(spellCooldown[2] > 0) {
 			spellCooldown[2]--;
-			if(spellCooldown[2] % 180 == 0 && regenTarget != null) regenTarget.heal(spellPower / 4);
 		}
+		else if(mp < 30) isSpellOnCooldown[2] = true;
 		else isSpellOnCooldown[2] = false;
+		
+		if(spellCooldown[3] > 0) {
+			spellCooldown[3]--;
+		}
+		else if(mp < 10) isSpellOnCooldown[3] = true;
+		else isSpellOnCooldown[3] = false;
 		
 		if(distance == 2) speed = baseSpeed + 15;
 		else speed = baseSpeed;
@@ -97,8 +104,6 @@ public class WhiteMage extends BaseCharacter {
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("White Magic")) {
-					BaseLevel.changeMenuOptions(spellSet[0], spellSet[1], spellSet[2], spellSet[3], 
-							isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
 					baseMenu = false;
 					spellMenu = true;
 					BaseLevel.changeMenuSelect("RIGHT");
@@ -117,13 +122,13 @@ public class WhiteMage extends BaseCharacter {
 					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Mega Heal") && !isSpellOnCooldown[1] && mp >= 30) {
+				else if(BaseLevel.getMenuOption().equals("Mega Heal") && !isSpellOnCooldown[2] && mp >= 30) {
 					megaHeal();
 					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Regen") && !isSpellOnCooldown[2] && mp >= 10) {
-					regen();
+				else if(BaseLevel.getMenuOption().equals("Regen") && !isSpellOnCooldown[3] && mp >= 10) {
+					regenMove();
 					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
@@ -137,8 +142,6 @@ public class WhiteMage extends BaseCharacter {
 				else {
 					spellMenu = false;
 					baseMenu = true;
-					BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
-							isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
 				}
 			BaseLevel.changeMenuSelect("LEFT");
 			}
@@ -226,7 +229,7 @@ public class WhiteMage extends BaseCharacter {
 		}
 	}
 	
-	public void regen() {
+	public void regenMove() {
 		time = 0;
 		mp -= 10;
 		spellCooldown[3] = 1200;
@@ -235,13 +238,11 @@ public class WhiteMage extends BaseCharacter {
 		queued = false;
 		BaseLevel.dequeueTurn();
 		if(distance == 2) {
-			if(BaseLevel.checkPos(pos - 3)) regenTarget = BaseLevel.getCharAt(pos - 3);
-			else if(BaseLevel.checkPos(pos - 6)) regenTarget = BaseLevel.getCharAt(pos - 6);
-			else regenTarget = null;
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).regen(spellPower / 4, 1080);
+			else if(BaseLevel.checkPos(pos - 6)) BaseLevel.getCharAt(pos - 6).regen(spellPower / 4, 1080);
 		}
 		else if(distance == 1) {
-			if(BaseLevel.checkPos(pos - 3)) regenTarget = BaseLevel.getCharAt(pos - 3);
-			else regenTarget = null;
+			if(BaseLevel.checkPos(pos - 3)) BaseLevel.getCharAt(pos - 3).regen(spellPower / 4, 1080);
 			}
 	}
 }

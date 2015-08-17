@@ -3,7 +3,10 @@ package characters;
 import game.gamestate.BaseLevel;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
 
 public class Monk extends BaseCharacter{
 	
@@ -18,13 +21,16 @@ public class Monk extends BaseCharacter{
 	public void init() {
 		super.init();
 		className = "Monk";
+		mpName = "Charms";
 		range = 1;
+		sprite = new ImageIcon("Sprites/Monk.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
 		moveSet[0] = "Attack";
 		moveSet[1] = "Charm Spell";
 		moveSet[2] = "Meditate";
 		moveSet[3] = "Item";
 		
 		spellSet[0] = "Power Punch";
+		spellSet[1] = "Cleanse";
 
 		baseAttack = attack;
 		baseArmor = armor;
@@ -44,7 +50,14 @@ public class Monk extends BaseCharacter{
 		if(spellCooldown[0] > 0) {
 			spellCooldown[0]--;
 		}
+		else if(mp == 0) isSpellOnCooldown[0] = true;
 		else isSpellOnCooldown[0] = false;
+		
+		if(spellCooldown[1] > 0) {
+			spellCooldown[1]--;
+		}
+		else if(mp == 0) isSpellOnCooldown[1] = true;
+		else isSpellOnCooldown[1] = false;
 	}
 	
 	public void keyPressed(int k) {
@@ -84,8 +97,6 @@ public class Monk extends BaseCharacter{
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("Charm Spell")) {
-					BaseLevel.changeMenuOptions(spellSet[0], spellSet[1], spellSet[2], spellSet[3], 
-							isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
 					baseMenu = false;
 					spellMenu = true;
 					BaseLevel.changeMenuSelect("RIGHT");
@@ -94,8 +105,13 @@ public class Monk extends BaseCharacter{
 					meditate();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Power Punch") && mp > 0) {
+				else if(BaseLevel.getMenuOption().equals("Power Punch") && !isSpellOnCooldown[0]) {
 					powerPunch();
+					BaseLevel.changeMenuSelect("RIGHT");
+					spellMenu = false;
+				}
+				else if(BaseLevel.getMenuOption().equals("Cleanse") && !isSpellOnCooldown[1]) {
+					cleanse();
 					BaseLevel.changeMenuSelect("RIGHT");
 					spellMenu = false;
 				}
@@ -109,8 +125,6 @@ public class Monk extends BaseCharacter{
 				else {
 					spellMenu = false;
 					baseMenu = true;
-					BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
-							isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
 				}
 			BaseLevel.changeMenuSelect("LEFT");
 			}
@@ -134,13 +148,16 @@ public class Monk extends BaseCharacter{
 			if(distance == 2) {
 				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
 				else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, damage);
-				else if(distance < range) if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
+				else if(distance < range) 
+					if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
 			}
 			else if(distance == 1) {
 				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
-				else if(distance < range) if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
+				else if(distance < range)
+					if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
 			}
-			else if(distance < range) if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
+			else if(distance < range) 
+				if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
 		}
 	}
 	
@@ -159,6 +176,15 @@ public class Monk extends BaseCharacter{
 		queued = false;
 		mp--;
 		attack((int)(attack * 2));
+	}
+	
+	public void cleanse() {
+		time = 0;
+		attacking = false;
+		queued = false;
+		mp--;
+		heal(maxHp / 4);
+		BaseLevel.dequeueTurn();
 	}
 
 }

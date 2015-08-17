@@ -64,6 +64,11 @@ public class BaseCharacter {
 	int[] spellCooldown;
 	boolean spellMenu;
 	
+	int regenCount;
+	int regenAmount;
+	
+	public String mpName;
+	
 	public BaseCharacter(int num, int pos, Color col) {
 		this.num = num;
 		this.pos = pos;
@@ -105,6 +110,8 @@ public class BaseCharacter {
 		arrow = loader.loadImage("/Arrow.png").getScaledInstance(gmHt / 36, gmHt / 18, Image.SCALE_SMOOTH);
 		arrowFloat = 0;
 		floatCount = 0;
+		lane = pos % 3;
+		distance = pos / 3;
 		
 		
 		moveSet = new String[]{"Attack", "Magic", "", "Item"};
@@ -116,6 +123,7 @@ public class BaseCharacter {
 		isSpellOnCooldown = new boolean[]{false, false, false, false};
 		spellCooldown = new int[]{0, 0, 0, 0};
 		spellMenu = false;
+		
 	}
 	
 	public void tick() {
@@ -152,6 +160,8 @@ public class BaseCharacter {
 
 		if(attacking && baseMenu) BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
 				isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
+		else if(attacking && spellMenu) BaseLevel.changeMenuOptions(spellSet[0], spellSet[1], spellSet[2], spellSet[3], 
+				isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
 		
 		floatCount++;
 		if(floatCount >= 120) floatCount = 0;
@@ -163,40 +173,17 @@ public class BaseCharacter {
 			else if(floatCount < 100) arrowFloat -= gmHt / 144;
 			else arrowFloat -= gmHt / 288;
 		}
+		
+		if(regenCount > 0) {
+			regenCount--;
+			if(regenCount % 180 == 0) hp += regenAmount;
+			if(hp > maxHp) hp = maxHp;
+		}
 	}
 	
 	
 	public void draw(Graphics g) {
-		if(selected) {
-			g.setColor(Color.YELLOW);
-			if(distance == 0) {
-				for(int i = 0; i < 40; i++) {
-					for(int j = 0; j < 20; j++) {
-						if((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) 
-							g.fillRect(x - gmHt / 36 + (gmHt * j / 9 / 20), y - gmHt / 24 + (gmHt * i / 6 / 40), gmHt / 9 / 20, gmHt / 6 / 40);
-					}
-				}
-				//g.fillRect(x - gmHt / 36, y - gmHt / 24, gmHt / 9, gmHt / 6);
-			}
-			else if(distance == 1) {
-				for(int i = 0; i < 40; i++) {
-					for(int j = 0; j < 20; j++) {
-						if((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) 
-							g.fillRect(x - gmHt / 26 + (int)(gmHt * j / 7.5 / 20), y - gmHt / 12 + (gmHt * i / 5 / 40), (int)(gmHt / 7.5 / 20), (gmHt / 5 / 40));
-					}
-				}
-				//g.fillRect(x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5);
-			}
-			else {
-				for(int i = 0; i < 40; i++) {
-					for(int j = 0; j < 20; j++) {
-						if((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) 
-							g.fillRect(x - gmHt / 19 + (gmHt * j / 6 / 20), y - gmHt / 10 + (gmHt * i / 4 / 40), (gmHt / 6 / 20), (gmHt / 4 / 40));
-					}
-				}
-				//g.fillRect(x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4);
-			}
-		}
+	
 		g.setColor(col);
 		if(pos == 0) {
 			x = gmHt * 23 / 36;
@@ -235,17 +222,47 @@ public class BaseCharacter {
 			y = rowCoord2;
 		}
 		
-		if(className.equals("White Mage") || className.equals("Black Mage") || className.equals("Warrior")) {
-			if(distance == 0) g.drawImage(sprite, x - gmHt / 36, y - gmHt / 24, null);
-			else if(distance == 1) g.drawImage(sprite, x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5, null);
-			else g.drawImage(sprite, x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4, null);
-			
+		if(selected) {
+			g.setColor(Color.YELLOW);
+			if(distance == 0) {
+				for(int i = 0; i < 40; i++) {
+					for(int j = 0; j < 20; j++) {
+						if((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) 
+							g.fillRect(x - gmHt / 36 + (gmHt * j / 9 / 20), y - gmHt / 24 + (gmHt * i / 6 / 40), gmHt / 9 / 20, gmHt / 6 / 40);
+					}
+				}
+				//g.fillRect(x - gmHt / 36, y - gmHt / 24, gmHt / 9, gmHt / 6);
+			}
+			else if(distance == 1) {
+				for(int i = 0; i < 40; i++) {
+					for(int j = 0; j < 20; j++) {
+						if((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) 
+							g.fillRect(x - gmHt / 26 + (int)(gmHt * j / 7.5 / 20), y - gmHt / 12 + (gmHt * i / 5 / 40), (int)(gmHt / 7.5 / 20), (gmHt / 5 / 40));
+					}
+				}
+				//g.fillRect(x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5);
+			}
+			else {
+				for(int i = 0; i < 40; i++) {
+					for(int j = 0; j < 20; j++) {
+						if((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1)) 
+							g.fillRect(x - gmHt / 19 + (gmHt * j / 6 / 20), y - gmHt / 10 + (gmHt * i / 4 / 40), (gmHt / 6 / 20), (gmHt / 4 / 40));
+					}
+				}
+				//g.fillRect(x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4);
+			}
 		}
-		else g.fillRect(x, y, wd, ht);
+		
+		if(distance == 0) g.drawImage(sprite, x - gmHt / 36, y - gmHt / 24, null);
+		else if(distance == 1) g.drawImage(sprite, x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5, null);
+		else g.drawImage(sprite, x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4, null);
+			
+		//g.fillRect(x, y, wd, ht);
 		
 		if(attacking) {
-			
-			g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 12 - arrowFloat, null);
+			if(distance == 0) g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 12 - (arrowFloat / 2), gmHt / 48, gmHt / 24, null);
+			else if(distance == 1) g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 7 - (arrowFloat * 3 / 4), null);
+			else g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 6 - arrowFloat, gmHt / 28, gmHt / 14, null);
 		}
 		
 	}
@@ -399,8 +416,15 @@ public class BaseCharacter {
 	}
 	
 	public void heal(int amount) {
-		hp += amount;
-		if(hp > maxHp) hp = maxHp;
+		if(alive) {
+			hp += amount;
+			if(hp > maxHp) hp = maxHp;
+		}
+	}
+	
+	public void regen(int amount, int duration) {
+		regenAmount = amount;
+		regenCount = duration;
 	}
 	
 	public boolean getAlive() {
@@ -471,6 +495,14 @@ public class BaseCharacter {
 			}
 		}
 		return temp;
+	}
+	
+	public int getCurrentCooldown() {
+		for(int i = 0; i < moveSet.length; i++)
+			if(BaseLevel.getMenuOption().equals(moveSet[i])) return moveCooldown[i] / 60;
+		for(int i = 0; i < spellSet.length; i++)
+			if(BaseLevel.getMenuOption().equals(spellSet[i])) return spellCooldown[i] / 60;
+		return 0;
 	}
 	
 	

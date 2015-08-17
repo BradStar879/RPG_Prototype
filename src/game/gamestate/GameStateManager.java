@@ -11,7 +11,7 @@ public class GameStateManager {
 
 	public GameStateManager(){
 		states = new Stack<GameState>();
-		states.push(new MenuState(this));
+		states.push(new StartScreen(this));
 	}
 	
 	public void tick(){

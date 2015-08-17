@@ -33,6 +33,7 @@ public class BaseMob {
 	Image sprite;
 	public int xp;
 	public String[] items;
+	public String[] rareItems;
 	
 	public BaseMob(int lane) {
 		this.lane = lane;
@@ -74,7 +75,9 @@ public class BaseMob {
 			}
 		}
 		if(!alive && delayCount > 0) {
-			BaseLevel.grid.attackWarningOff(attackPos);
+			BaseLevel.grid.attackWarningOff(lane);
+			BaseLevel.grid.attackWarningOff(lane + 3);
+			BaseLevel.grid.attackWarningOff(lane + 6);
 			delayCount = 0;
 		}
 	}
@@ -128,6 +131,10 @@ public class BaseMob {
 	
 	public String getItem() {
 		return items[(int)(Math.random() * items.length)];
+	}
+	
+	public String getRareItem() {
+		return rareItems[(int)(Math.random() * rareItems.length)];
 	}
 
 }

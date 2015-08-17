@@ -4,8 +4,11 @@ import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+
+import javax.swing.ImageIcon;
 
 import player.CharacterStats;
 import player.Inventory;
@@ -48,6 +51,11 @@ public class World extends GameState{
 	public int worldLength;
 	public int worldHeight;
 	
+	public Image walkerUp;
+	public Image walkerRight;
+	public Image walkerDown;
+	public Image walkerLeft;
+	
 	public WorldPauseDisplay pDisplay;
 
 	public World(GameStateManager gsm) {
@@ -86,9 +94,17 @@ public class World extends GameState{
 		world = new BaseWorldBlock[worldHeight][worldLength];
 		loadImageLevel(worldDrawn);
 		pDisplay = new WorldPauseDisplay();
+		walkerUp = new ImageIcon("Sprites/WalkerUp.png").getImage();
+		walkerRight = new ImageIcon("Sprites/WalkerRight.png").getImage();
+		walkerDown = new ImageIcon("Sprites/WalkerDown.png").getImage();
+		walkerLeft = new ImageIcon("Sprites/WalkerLeft.png").getImage();
 		inv.addItem("Fire Arrow");
 		inv.addItem("Fire Arrow");
 		inv.addItem("Fire Arrow");
+		inv.addItem("Cloth Robe");
+		inv.addItem("Cloth Cloak");
+		inv.addItem("Wood Sword");
+		inv.addItem("Wood Staff");
 		
 	}
 
@@ -191,8 +207,12 @@ public class World extends GameState{
 			}
 		}
 		
-		g.setColor(Color.BLACK);
-		g.fillRect(blockSize * 11 + blockSize / 4,  blockSize * 6 + blockSize / 4, blockSize / 2, blockSize / 2);
+		//g.setColor(Color.BLACK);
+		//g.fillRect(blockSize * 11 + blockSize / 4,  blockSize * 6 + blockSize / 4, blockSize / 2, blockSize / 2);
+		if(dir == 0) g.drawImage(walkerUp, blockSize * 11,  blockSize * 6, blockSize, blockSize, null);
+		else if(dir == 1) g.drawImage(walkerRight, blockSize * 11,  blockSize * 6, blockSize, blockSize, null);
+		else if(dir == 2) g.drawImage(walkerDown, blockSize * 11,  blockSize * 6, blockSize, blockSize, null);
+		else if(dir == 3) g.drawImage(walkerLeft, blockSize * 11,  blockSize * 6, blockSize, blockSize, null);
 		if(battle)
 			if(Animations.splitScreenVert(g, 180)) battleEngage();
 		
@@ -227,8 +247,8 @@ public class World extends GameState{
 				dir = 3;
 				player.steps++;
 			}
-			else if(k == KeyEvent.VK_Q) battle = true;
-			else if(k == KeyEvent.VK_E) enterCity();
+			//else if(k == KeyEvent.VK_Q) battle = true;
+			//else if(k == KeyEvent.VK_E) enterCity();
 		}
 		if(k == KeyEvent.VK_ESCAPE && !battle && !paused) {
 			paused = true;
@@ -273,7 +293,7 @@ public class World extends GameState{
 	public void battleChance() {
 		if(Math.random() * 100 < battleProb && player.steps > 4) {
 			player.steps = 0;
-			//battle = true;
+			battle = true;
 		}
 	}
 	
@@ -281,7 +301,6 @@ public class World extends GameState{
 		battle = false;
 		Animations.delay = 0;
 		BaseLevel.team = World.team;
-		for(int i = 0; i < 3; i++) BaseLevel.mobName[i] = "Pig";
 		gsm.states.push(new BaseLevel(gsm));
 	}
 	

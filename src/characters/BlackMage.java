@@ -19,6 +19,7 @@ public class BlackMage extends BaseCharacter{
 	public void init() {
 		super.init();
 		className = "Black Mage";
+		mpName = "MP";
 		range = 3;
 		sprite = new ImageIcon("Sprites/BlackMage.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
 		moveSet[0] = "Attack";
@@ -40,16 +41,19 @@ public class BlackMage extends BaseCharacter{
 		if(spellCooldown[0] > 0) {
 			spellCooldown[0]--;
 		}
+		else if(mp < 20) isSpellOnCooldown[0] = true;
 		else isSpellOnCooldown[0] = false;
 		
 		if(spellCooldown[1] > 0) {
 			spellCooldown[1]--;
 		}
+		else if(mp < 20) isSpellOnCooldown[1] = true;
 		else isSpellOnCooldown[1] = false;
 		
 		if(spellCooldown[2] > 0) {
 			spellCooldown[2]--;
 		}
+		else if(mp < 20) isSpellOnCooldown[2] = true;
 		else isSpellOnCooldown[2] = false;
 		
 		if(distance == 2) speed = baseSpeed + 15;
@@ -95,8 +99,6 @@ public class BlackMage extends BaseCharacter{
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("Black Magic")) {
-					BaseLevel.changeMenuOptions(spellSet[0], spellSet[1], spellSet[2], spellSet[3], 
-							isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
 					baseMenu = false;
 					spellMenu = true;
 					BaseLevel.changeMenuSelect("RIGHT");
@@ -105,17 +107,17 @@ public class BlackMage extends BaseCharacter{
 					rejuvinate();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Fire") && !isSpellOnCooldown[0] && mp >= 20) {
+				else if(BaseLevel.getMenuOption().equals("Fire") && !isSpellOnCooldown[0]) {
 					fire();
 					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Ice") && !isSpellOnCooldown[1] && mp >= 20) {
+				else if(BaseLevel.getMenuOption().equals("Ice") && !isSpellOnCooldown[1]) {
 					ice();
 					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Lightning") && !isSpellOnCooldown[2] && mp >= 20) {
+				else if(BaseLevel.getMenuOption().equals("Lightning") && !isSpellOnCooldown[2]) {
 					lightning();
 					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
@@ -130,8 +132,6 @@ public class BlackMage extends BaseCharacter{
 				else {
 					spellMenu = false;
 					baseMenu = true;
-					BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
-							isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
 				}
 			BaseLevel.changeMenuSelect("LEFT");
 			}

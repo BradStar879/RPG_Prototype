@@ -3,7 +3,10 @@ package characters;
 import game.gamestate.BaseLevel;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+
+import javax.swing.ImageIcon;
 
 public class Spearman extends BaseCharacter{
 	
@@ -19,11 +22,15 @@ public class Spearman extends BaseCharacter{
 		super.init();
 		mp = maxMp;
 		className = "Spearman";
+		mpName = "Energy";
 		range = 2;
+		sprite = new ImageIcon("Sprites/Spearman.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
 		moveSet[0] = "Attack";
-		moveSet[1] = "Energy Attack";
+		moveSet[1] = "Energy";
 		moveSet[2] = "Stretch";
 		moveSet[3] = "Item";
+		
+		spellSet[0] = "Throw Spear";
 		
 	}
 	
@@ -34,6 +41,14 @@ public class Spearman extends BaseCharacter{
 			if(moveCooldown[2] > 2400) range = 3;
 			else range = 2;
 		}
+		else if(mp < 20) isMoveOnCooldown[2] = true;
+		else isMoveOnCooldown[2] = false;
+		
+		if(spellCooldown[0] > 0) {
+			spellCooldown[0]--;
+		}
+		else if(mp < 40) isSpellOnCooldown[0] = true;
+		else isSpellOnCooldown[0] = false;
 		
 		energyCount++;
 		if(energyCount == 120) {
@@ -78,8 +93,18 @@ public class Spearman extends BaseCharacter{
 					attack(attack);
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Stretch") && !isMoveOnCooldown[1] && mp >= 20) {
+				else if(BaseLevel.getMenuOption().equals("Energy Attack")) {
+					baseMenu = false;
+					spellMenu = true;
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
+				else if(BaseLevel.getMenuOption().equals("Stretch") && !isMoveOnCooldown[2]) {
 					stretch();
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
+				else if(BaseLevel.getMenuOption().equals("Throw Spear") && !isSpellOnCooldown[0]) {
+					throwSpear();
+					spellMenu = false;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 			}
@@ -92,8 +117,6 @@ public class Spearman extends BaseCharacter{
 				else {
 					spellMenu = false;
 					baseMenu = true;
-					BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
-							isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
 				}
 			BaseLevel.changeMenuSelect("LEFT");
 			}
@@ -108,5 +131,17 @@ public class Spearman extends BaseCharacter{
 		attacking = false;
 		queued = false;
 		BaseLevel.dequeueTurn();
+	}
+	
+	public void throwSpear() {
+		time = 0;
+		mp -= 40;
+		spellCooldown[0] = 1800;
+		isSpellOnCooldown[0] = true;
+		attacking = false;
+		queued = false;
+		range = 3;
+		attack((int)(attack * 1.5));
+		range = 2;
 	}
 }

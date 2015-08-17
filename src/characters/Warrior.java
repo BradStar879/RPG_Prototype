@@ -11,6 +11,8 @@ import javax.swing.ImageIcon;
 public class Warrior extends BaseCharacter{
 	
 	boolean block;
+	int stoneSkinCount;
+	int baseArmor;
 
 	public Warrior(int num, int pos, Color col, String name, int level, int hp,
 			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack) {
@@ -20,9 +22,11 @@ public class Warrior extends BaseCharacter{
 	
 	public void init() {
 		super.init();
+		this.baseArmor = armor;
 		sprite = new ImageIcon("Sprites/Warrior.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
 		mp = 0;
 		className = "Warrior";
+		mpName = "Rage";
 		range = 1;
 		moveSet[0] = "Attack";
 		moveSet[1] = "Rage Attack";
@@ -30,8 +34,10 @@ public class Warrior extends BaseCharacter{
 		moveSet[3] = "Item";
 		
 		spellSet[0] = "Bash";
+		spellSet[1] = "Stone Skin";
 		
 		block = false;
+		stoneSkinCount = 0;
 	}
 	
 	public void tick() {
@@ -39,9 +45,19 @@ public class Warrior extends BaseCharacter{
 		if(moveCooldown[2] > 0) {
 			moveCooldown[2]--;
 		}
+		else if(mp < 15) isMoveOnCooldown[2] = true;
 		else isMoveOnCooldown[2] = false;
+		
 		if(mp < 25) isSpellOnCooldown[0] = true;
-		else isSpellOnCooldown[0] = true;
+		else isSpellOnCooldown[0] = false;
+		
+		if(mp < 25) isSpellOnCooldown[1] = true;
+		else isSpellOnCooldown[1] = false;
+		
+		if(stoneSkinCount > 0) {
+			stoneSkinCount--;
+			armor = baseArmor + 3;
+		}
 	}
 	
 	public void keyPressed(int k) {
@@ -82,21 +98,25 @@ public class Warrior extends BaseCharacter{
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 				else if(BaseLevel.getMenuOption().equals("Rage Attack")) {
-					BaseLevel.changeMenuOptions(spellSet[0], spellSet[1], spellSet[2], spellSet[3], 
-							isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
 					baseMenu = false;
 					spellMenu = true;
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Block") && !isMoveOnCooldown[1]) {
+				else if(BaseLevel.getMenuOption().equals("Block") && !isMoveOnCooldown[2]) {
 					time = 0;
 					block();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Bash") && mp >= 25) {
+				else if(BaseLevel.getMenuOption().equals("Bash") && !isSpellOnCooldown[0]) {
 					time = 0;
 					spellMenu = false;
 					bash();
+					BaseLevel.changeMenuSelect("RIGHT");
+				}
+				else if(BaseLevel.getMenuOption().equals("Bash") && !isSpellOnCooldown[1]) {
+					time = 0;
+					spellMenu = false;
+					stoneSkin();
 					BaseLevel.changeMenuSelect("RIGHT");
 				}
 			}
@@ -108,8 +128,6 @@ public class Warrior extends BaseCharacter{
 				}
 				else {
 					baseMenu = true;
-					BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
-							isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
 				}
 			BaseLevel.changeMenuSelect("LEFT");
 			}
@@ -118,6 +136,7 @@ public class Warrior extends BaseCharacter{
 	
 	public void takeDamage(int damage) {
 		mp += damage * 3 / 5;
+		if(mp > maxMp) mp = maxMp;
 		if(block) block = false;
 		else {
 			if(armor >= damage) {
@@ -132,6 +151,7 @@ public class Warrior extends BaseCharacter{
 	
 	public void block() {
 		block = true;
+		mp -= 15;
 		moveCooldown[2] = 3600;
 		isMoveOnCooldown[2] = true;
 		attacking = false;
@@ -144,6 +164,14 @@ public class Warrior extends BaseCharacter{
 		attacking = false;
 		queued = false;
 		attack((int)(attack * 1.5));
+	}
+	
+	public void stoneSkin() {
+		mp -= 25;
+		attacking = false;
+		queued = false;
+		stoneSkinCount = 900;
+		BaseLevel.dequeueTurn();
 	}
 }
 

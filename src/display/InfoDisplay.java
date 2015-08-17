@@ -1,4 +1,4 @@
-package display;
+ package display;
 
 import game.gamestate.BaseLevel;
 import game.main.GamePanel;

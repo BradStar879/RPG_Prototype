@@ -1,6 +1,5 @@
 package game.gamestate;
 
-import game.main.Game;
 import game.main.GamePanel;
 
 import java.awt.AlphaComposite;
@@ -12,7 +11,6 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 
 import player.Saver;
 
@@ -71,6 +69,14 @@ public class MenuState extends GameState{
 				}
 				g2d.setFont(new Font("pixelmix", Font.PLAIN, ht / 7));
 				g2d.drawString(options[i], wd / 3, ht / 5 + i * ht / 5);
+				//g2d.rotate(Math.PI / 2);
+				g2d.setFont(new Font("pixelmix", Font.PLAIN, ht / 30));
+				g2d.setColor(Color.WHITE);
+				g2d.drawString("By Brad Patterson", wd * 3 / 4, ht * 14 / 15);
+				g2d.setFont(new Font("pixelmix", Font.PLAIN, ht / 15));
+				g2d.setColor(Color.YELLOW);
+				g2d.drawString("Alpha 1.0", wd / 20, ht / 5);
+				//g2d.rotate(-Math.PI / 2);
 			}
 		}
 		

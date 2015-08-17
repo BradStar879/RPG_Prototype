@@ -1,5 +1,6 @@
 package display;
 
+import game.gamestate.BaseLevel;
 import game.main.GamePanel;
 
 import java.awt.Color;
@@ -10,6 +11,7 @@ import java.awt.Image;
 import javax.swing.ImageIcon;
 
 import characters.BaseCharacter;
+import characters.Spells;
 
 public class QueueDisplay {
 	
@@ -20,12 +22,8 @@ public class QueueDisplay {
 	int queueHt = ht / 4;
 	int border = ht / 62;
 	Image queueBox = new ImageIcon("Sprites/QueueBox.png").getImage();
-	String[][] movesOnCooldown = new String[3][4];
-	String[][] spellsOnCooldown = new String[3][4];
-	int[] amountMovesOnCooldown = new int[3];
-	int[] amountSpellsOnCooldown = new int[3];
-	int[][] moveCooldowns = new int[3][4];
-	int[][] spellCooldown = new int[3][4];
+	Image shortQueueBox = new ImageIcon("Sprites/ShortQueueDisplay.png").getImage();
+	Spells spell;
 	
 	public QueueDisplay() {}
 	
@@ -33,12 +31,6 @@ public class QueueDisplay {
 		
 		for(int j = 0; j < 3; j++) {
 			if(disQueue[j] != null) {
-				movesOnCooldown[j] = disQueue[j].getMovesOnCooldown();
-				amountMovesOnCooldown[j] = disQueue[j].getMovesOnCooldown().length;
-				moveCooldowns[j] = disQueue[j].getMoveSetCooldowns();
-				spellsOnCooldown[j] = disQueue[j].getSpellsOnCooldown();
-				amountSpellsOnCooldown[j] = disQueue[j].getSpellsOnCooldown().length;
-				spellCooldown[j] = disQueue[j].getSpellSetCooldowns();
 			}
 		}
 	}
@@ -47,14 +39,22 @@ public class QueueDisplay {
 		
 		for(int j = 0; j < 3; j++) {
 			if(disQueue[j] != null) {
-				g.drawImage(queueBox, wd - queueWd, ht - (queueHt * (2 + j)), queueWd, queueHt, null);
+				if(j == 0 && disQueue[j] != null) {
+					g.drawImage(queueBox, wd - queueWd, ht - queueHt * 2 - (j * (ht / 10)), queueWd, queueHt, null);
+					spell = new Spells(BaseLevel.getMenuOption());
+					g.drawString(spell.name,  wd - queueWd + border * 2,  ht - (queueHt * 2) + border * 6);
+					if(spell.mpCost != -1) {
+						g.drawString(disQueue[j].mpName + ": " + spell.mpCost,  wd - queueWd + border * 2,  ht - queueHt * 2 + border * 8);
+						g.drawString("Cd: " + spell.cooldown / 60 + " sec",  wd - queueWd + border * 2,  ht - queueHt * 2 + border * 10);
+					}
+					if(disQueue[j].getCurrentCooldown() != 0) {
+						g.drawString("Cd left: " + (disQueue[j].getCurrentCooldown() + 1), wd - queueWd + border * 2,  ht - queueHt * 2 + border * 12);
+					}
+				}
+				if(j != 0) g.drawImage(shortQueueBox, wd - queueWd, ht - queueHt * 2 - (j * (ht / 10)), queueWd, ht / 10, null);
 				g.setColor(Color.WHITE);
 				g.setFont(new Font("pixelmix", Font.PLAIN, ht / 50));
-				g.drawString(disQueue[j].getName(), wd - queueWd + border * 2,  ht - (queueHt * (2 + j)) + border * 3);
-				for(int i = 0; i < amountMovesOnCooldown[j]; i++)
-					g.drawString(movesOnCooldown[j][i] + ": " + moveCooldowns[j][i],  wd - queueWd + border * 2, ht - (queueHt * (2 + j)) + border * 3 + (2 * border * (i + 1)));
-				for(int i = 0; i < amountSpellsOnCooldown[j]; i++)
-					g.drawString(spellsOnCooldown[j][i] + ": " + spellCooldown[j][i],  wd - queueWd + border * 2, ht - (queueHt * (2 + j)) + border * 3 + (2 * border * (i + 1 + amountMovesOnCooldown[j])));
+				g.drawString(disQueue[j].getName(), wd - queueWd + border * 2,  ht - 2 * queueHt - (j * (ht / 10)) + border * 7 / 2);
 			}
 		}
 	}

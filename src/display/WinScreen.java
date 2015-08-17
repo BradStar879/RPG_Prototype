@@ -43,14 +43,9 @@ public class WinScreen{
 	}
 
 	
-	public void init() {
-		
-	}
-
-	
 	public void tick() {
 		
-		if(won && screenTick % 2 == 0) {
+		if(screenTick % 2 == 0) {
 			
 			if(screenHeight <= 0) {
 				screenSpeed += wd / 300;
@@ -98,9 +93,22 @@ public class WinScreen{
 			else health = red;
 			g.drawImage(black, wd / 6 - border / 2, ht / 10 + (i * ht / 3) + border * 7 - border / 4 + screenHeight, wd / 8 + border, border * 3 / 2, null);
 			g.drawImage(health, wd / 6, ht / 10 + (i * ht / 3) + border * 7 + screenHeight, (wd / 8) * team[i].hp / team[i].maxHp, border,  null);
-			g.drawString("MP: " + team[i].mp + " / " + team[i].maxMp, wd / 6, ht / 10 + (i * ht / 3) + border * 10 + screenHeight);
 			g.drawImage(black, wd / 6 - border / 2, ht / 10 + (i * ht / 3) + border * 11 - border / 4 + screenHeight, wd / 8 + border, border * 3 / 2, null);
-			if(team[i].mp > 0) g.drawImage(purple, wd / 6, ht / 10 + (i * ht / 3) + border * 11 + screenHeight, (wd / 8) * team[i].mp / team[i].maxMp, border, null);
+			if(team[i].className.equals("Black Mage") || team[i].className.equals("White Mage")) {
+				g.drawString("MP: " + team[i].mp + "/" + team[i].maxMp, wd / 6, ht / 10 + (i * ht / 3) + border * 10 + screenHeight);
+				g.drawImage(purple, wd / 6, ht / 10 + (i * ht / 3) + border * 11 + screenHeight, (wd / 8) * team[i].mp / team[i].maxMp, border, null);
+			}
+			else if(team[i].className.equals("Warrior")) {
+				g.drawString("Rage: " + team[i].mp + "/" + team[i].maxMp, wd / 6, ht / 10 + (i * ht / 3) + border * 10 + screenHeight);
+			}
+			else if(team[i].className.equals("Spearman")) {
+				g.drawString("Energy: " + team[i].mp + "/" + team[i].maxMp, wd / 6, ht / 10 + (i * ht / 3) + border * 10 + screenHeight);
+				g.drawImage(yellow, wd / 6, ht / 10 + (i * ht / 3) + border * 11 + screenHeight, (wd / 8) * team[i].mp / team[i].maxMp, border, null);
+			}
+			else if(team[i].className.equals("Monk")) {
+				g.drawString("Charms: " + team[i].mp + "/" + team[i].maxMp, wd / 6, ht / 10 + (i * ht / 3) + border * 10 + screenHeight);
+				g.drawImage(green, wd / 6, ht / 10 + (i * ht / 3) + border * 11 + screenHeight, (wd / 8) * team[i].mp / team[i].maxMp, border, null);
+			}
 			g.drawString("Attack: " + team[i].attack, wd / 3, ht / 10 + (i * ht / 3) + screenHeight);
 			g.drawString("Spell Power: " + team[i].spellPower, wd / 3, ht / 10 + (i * ht / 3) + border * 3 + screenHeight);
 			g.drawString("Armor: " + team[i].armor, wd / 3, ht / 10 + (i * ht / 3) + border * 6 + screenHeight);

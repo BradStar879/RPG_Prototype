@@ -13,6 +13,7 @@ import java.util.Queue;
 import javax.swing.ImageIcon;
 
 import mobs.BaseMob;
+import mobs.Bunny;
 import mobs.Pig;
 import player.CharacterStats;
 import characters.Archer;
@@ -26,6 +27,7 @@ import characters.WhiteMage;
 import display.BufferedImageLoader;
 import display.Grid;
 import display.InfoDisplay;
+import display.LossScreen;
 import display.PauseDisplay;
 import display.QueueDisplay;
 import display.WinScreen;
@@ -74,13 +76,13 @@ public class BaseLevel extends GameState{
 	public static QueueDisplay qDisplay;
 	public PauseDisplay pDisplay;
 	public WinScreen wScreen;
+	public LossScreen lScreen;
 	public static Grid grid;
 	public static CharacterStats[] team;
 	
-	public static String[] mobName = new String[3];
 	int numItemsWon;
 	int itemsWonChance;
-	String[] possibleItems;
+
 	static String[] itemsWon;
 	static int currencyWon;
 	static int xp;
@@ -114,7 +116,7 @@ public class BaseLevel extends GameState{
 		loader = new BufferedImageLoader();
 		sideArrow = loader.loadImage("/SideArrow.png").getScaledInstance(ht / 40, border, Image.SCALE_SMOOTH);
 		menuBox = new ImageIcon("Sprites/MenuBox.png").getImage();
-		background = new ImageIcon("Sprites/GrassLandBackground.png").getImage();
+		background = new ImageIcon("Sprites/GrassLandBackground2.png").getImage();
 		
 		mobInLane = new boolean[3];
 		for(int i = 0; i < 3; i++) mobInLane[i] = true;
@@ -127,20 +129,29 @@ public class BaseLevel extends GameState{
 		
 		for(int i = 0; i < 3; i++) {
 		if(team[i].className.equals("Warrior")) chars[i] = new Warrior(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp, 
-				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack, team[i].armor, team[i].spellPower);
+				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor +
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
 		else if(team[i].className.equals("Black Mage")) chars[i] = new BlackMage(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp,
-				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack, team[i].armor, team[i].spellPower);
+				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor + 
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
 		else if(team[i].className.equals("White Mage")) chars[i] = new WhiteMage(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp, 
-				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack, team[i].armor, team[i].spellPower);
+				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor + 
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
 		else if(team[i].className.equals("Archer")) chars[i] = new Archer(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp,
-				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack, team[i].armor, team[i].spellPower);
+				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor +
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
 		else if(team[i].className.equals("Spearman")) chars[i] = new Spearman(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp, 
-				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack, team[i].armor, team[i].spellPower);
+				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor + 
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
 		else if(team[i].className.equals("Monk")) chars[i] = new Monk(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp,
-				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack, team[i].armor, team[i].spellPower);
+				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor + 
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
 		}
 			
-		for(int i = 0; i < 3; i++) if(mobName[i].equals("Pig")) mob[i] = new Pig(i);
+		for(int i = 0; i < 3; i++) {
+			if(Math.random() * 10 > 5) mob[i] = new Pig(i);
+			else mob[i] = new Bunny(i);
+		}
 		topInfo = new InfoDisplay(chars[0], 0);
 		midInfo = new InfoDisplay(chars[1], 1);
 		botInfo = new InfoDisplay(chars[2], 2);
@@ -149,18 +160,21 @@ public class BaseLevel extends GameState{
 		
 		xp = mob[0].xp + mob[1].xp + mob[2].xp;
 		currencyWon = (int)(Math.random() * 16 + 10);
-		itemsWonChance = (int)(Math.random() * 10);
-		if(itemsWonChance < 3) numItemsWon = 0;
-		else if(itemsWonChance < 6) numItemsWon = 1;
-		else if(itemsWonChance < 9) numItemsWon = 2;
-		else numItemsWon = 3;
+		itemsWonChance = (int)(Math.random() * 20);
+		if(itemsWonChance < 1) numItemsWon = 1;
+		else if(itemsWonChance < 4) numItemsWon = 2;
+		else if(itemsWonChance < 8) numItemsWon = 3;
+		else if(itemsWonChance < 12) numItemsWon = 4;
+		else if(itemsWonChance < 16) numItemsWon = 5;
+		else numItemsWon = 6;
 		itemsWon = new String[numItemsWon];
-		possibleItems = new String[]{mob[0].getItem(), mob[1].getItem(), mob[2].getItem()};
 		while(numItemsWon > 0) {
-			itemsWon[numItemsWon-1] = possibleItems[(int)(Math.random() * possibleItems.length)];
+			if((int)(Math.random() * 3) == 2)  itemsWon[numItemsWon-1] = mob[(int)(Math.random() * 3)].getRareItem();
+			else itemsWon[numItemsWon-1] = mob[(int)(Math.random() * 3)].getItem();
 			numItemsWon--;
 		}
 		wScreen = new WinScreen(xp, currencyWon, itemsWon);
+		lScreen = new LossScreen();
 		
 		grid = new Grid(wd, gridX, gridY);
 		
@@ -198,7 +212,6 @@ public class BaseLevel extends GameState{
 			}
 		}
 		if(won) {
-			wScreen.won = true;
 			wScreen.tick();
 			if(!experienceRewarded) {
 				saveStats();
@@ -207,6 +220,14 @@ public class BaseLevel extends GameState{
 			for(int i = 0; i < 3; i++) if(team[i].experience >= team[i].level * 500) team[i].levelUp();
 			battleEnd--;
 			if(battleEnd == 0) {
+				gsm.states.pop();
+			}
+		}
+		else if(lost) {
+			lScreen.tick();
+			battleEnd--;
+			if(battleEnd == 0) {
+				gsm.states.pop();
 				gsm.states.pop();
 			}
 		}
@@ -238,19 +259,15 @@ public class BaseLevel extends GameState{
 		qDisplay.draw(g);
 		
 		//test.draw(g);
-		for(int i = 0; i < 3; i++) {
-			chars[i].draw(g);
-			mob[i].draw(g);
-		}
+		for(int i = 0; i < 3; i++) mob[i].draw(g);
+		for(int i = 0; i < 3; i++) chars[i].draw(g);
 		
 		if(won) {
 			wScreen.draw(g);
 		}
 		
-		if(lost) {
-			g.setColor(Color.RED);
-			g.setFont(new Font("Comic Sans MS", Font.BOLD, wd / 10));
-			g.drawString("YOU LOSE!", wd / 5, ht * 2 / 3);
+		else if(lost) {
+			lScreen.draw(g);
 		}
 		
 		pDisplay.draw(g);
@@ -298,6 +315,10 @@ public class BaseLevel extends GameState{
 	public static void charSelectForward() {
 		if(charSelect == 2) charSelect = 0;
 		else charSelect++;
+		while(!chars[charSelect].getAlive()) {
+			if(charSelect == 2) charSelect = 0;
+			else charSelect++;
+		}
 	}
 	
 	public static void charSelectBack() {
@@ -344,11 +365,21 @@ public class BaseLevel extends GameState{
 		grid.attackWarning(pos);
 	}
 	
+	public static void startAttackLane(int lane) {
+		grid.attackWarning(lane);
+		grid.attackWarning(lane + 3);
+		grid.attackWarning(lane + 6);
+	}
+	
 	public static void attackChar(int pos, int attack) {
 		grid.attackWarningOff(pos);
 		if(posFilled[pos]) {
 			getCharAt(pos).takeDamage(attack);
 		}
+	}
+	
+	public static void attackChar(int pos) {
+		grid.attackWarningOff(pos);
 	}
 	
 	public static int getGridX(int i) {
@@ -409,9 +440,9 @@ public class BaseLevel extends GameState{
 	
 	public static void saveStats() {
 		for(int i = 0; i < 3; i++) {
-			team[i].experience += xp;
+			if(team[i].level != 100) team[i].experience += xp;
 			team[i].hp = chars[i].getHp();
-			if(team[i].className.equals("White Mage") || team[i].className.equals("Black Mage")) team[i].mp = chars[i].getMp();
+			if(team[i].className.equals("White Mage") || team[i].className.equals("Black Mage") || team[i].className.equals("Monk")) team[i].mp = chars[i].getMp();
 			if(team[i].experience >= team[i].experienceCap) {
 				team[i].levelUp();
 				WinScreen.leveled[i] = true;
