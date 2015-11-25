@@ -6,6 +6,7 @@ import game.gamestate.World;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import physics.Sounds;
 import world.BaseWorldBlock;
 
 public class StartingCity extends World{
@@ -29,13 +30,18 @@ public class StartingCity extends World{
 		shiftX = player.x - 5;
 		shiftY = player.y - 3;
 		speed = blockSize / 14;
+		edgeX = 9;
+		edgeY = 5;
+		bgm.stop();
+		bgm = new Sounds("Music/Castletheme.wav");
+		bgm.loop();
 		
 	}
 	
 	public void draw(Graphics g) {
 		
 		for(int i = player.y - 5; i < player.y + 5; i++) {
-			for(int j = player.x - 6; j < player.x + 9; j++) {
+			for(int j = player.x - 7; j < player.x + 9; j++) {
 				world[i][j].draw(g);
 			}
 		}

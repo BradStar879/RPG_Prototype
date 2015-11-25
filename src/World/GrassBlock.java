@@ -13,6 +13,7 @@ public class GrassBlock extends BaseWorldBlock{
 	public GrassBlock(int wd) {
 		this.wd = wd;
 		walkable = true;
+		enter = false;
 	}
 	
 	public void draw(Graphics g) {

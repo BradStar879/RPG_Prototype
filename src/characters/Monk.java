@@ -5,17 +5,23 @@ import game.gamestate.BaseLevel;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.util.Vector;
 
 import javax.swing.ImageIcon;
+
+import physics.Sounds;
 
 public class Monk extends BaseCharacter{
 	
 	int baseAttack;
 	int baseArmor;
+	Sounds attackSound = new Sounds("Sounds/punch.wav");
+	Sounds strongAttackSound = new Sounds("Sounds/hard punch.wav");
+	Sounds rejSound = new Sounds("Sounds/charging up.wav");
 
 	public Monk(int num, int pos, Color col, String name, int level, int hp,
-			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack);
+			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack, Vector<Spells> spells) {
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack, spells);
 	}
 	
 	public void init() {
@@ -24,109 +30,54 @@ public class Monk extends BaseCharacter{
 		mpName = "Charms";
 		range = 1;
 		sprite = new ImageIcon("Sprites/Monk.png").getImage().getScaledInstance(gmHt / 9, gmHt / 6, Image.SCALE_SMOOTH);
-		moveSet[0] = "Attack";
+		
 		moveSet[1] = "Charm Spell";
 		moveSet[2] = "Meditate";
-		moveSet[3] = "Item";
 		
-		spellSet[0] = "Power Punch";
-		spellSet[1] = "Cleanse";
-
 		baseAttack = attack;
 		baseArmor = armor;
 	}
 	
 	public void tick() {
 		super.tick();
-		if(moveCooldown[2] > 0) {
-			moveCooldown[2]--;
-			if(moveCooldown[2] > 1800) {
-				attack = baseAttack + spellPower;
-				armor = baseArmor + spellPower;
-			}
-			else attack = baseAttack;
+		if(moveCooldown[2] > 1800) {
+			attack = baseAttack + spellPower;
+			armor = baseArmor + spellPower;
 		}
-		
-		if(spellCooldown[0] > 0) {
-			spellCooldown[0]--;
+		else {
+			attack = baseAttack;
+			armor = baseArmor;
 		}
-		else if(mp == 0) isSpellOnCooldown[0] = true;
-		else isSpellOnCooldown[0] = false;
-		
-		if(spellCooldown[1] > 0) {
-			spellCooldown[1]--;
-		}
-		else if(mp == 0) isSpellOnCooldown[1] = true;
-		else isSpellOnCooldown[1] = false;
 	}
 	
 	public void keyPressed(int k) {
-		if(selected) {
-			if(k == KeyEvent.VK_W && pos > 2 && !BaseLevel.checkPos(pos - 3)) {
-				pos -= 3;
-				BaseLevel.changePos(pos + 3, false);
-				BaseLevel.changePos(pos, true);
-			}
-			if(k == KeyEvent.VK_S && pos < 6 && !BaseLevel.checkPos(pos + 3)) {
-				pos += 3;
-				BaseLevel.changePos(pos - 3, false);
-				BaseLevel.changePos(pos, true);
-			}
-			if(k == KeyEvent.VK_A && pos != 0  && pos != 3 && pos != 6)
-				if (!BaseLevel.checkPos(pos - 1)) {
-					pos -= 1;
-					BaseLevel.changePos(pos + 1, false);
-					BaseLevel.changePos(pos, true);
-				}
-			if(k == KeyEvent.VK_D && pos != 2  && pos != 5 && pos != 8)
-				if (!BaseLevel.checkPos(pos + 1)) {
-					pos += 1;
-					BaseLevel.changePos(pos - 1, false);
-					BaseLevel.changePos(pos, true);
-				}
-			
-			}
-		
-		
-		if(attacking) {
-			if(k == KeyEvent.VK_UP) BaseLevel.changeMenuSelect("UP");
-			if(k == KeyEvent.VK_DOWN) BaseLevel.changeMenuSelect("DOWN");
+		super.keyPressed(k);
+		if(attacking) {;
 			if(k == KeyEvent.VK_RIGHT) {
 				if(BaseLevel.getMenuOption().equals("Attack")) {
 					attack(attack);
-					BaseLevel.changeMenuSelect("RIGHT");
+					attackSound.play();
 				}
 				else if(BaseLevel.getMenuOption().equals("Charm Spell")) {
 					baseMenu = false;
 					spellMenu = true;
-					BaseLevel.changeMenuSelect("RIGHT");
+					BaseLevel.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
+						isSpellOnCooldown.elementAt(0), isSpellOnCooldown.elementAt(1), isSpellOnCooldown.elementAt(2), isSpellOnCooldown.elementAt(3));
 				}
-				else if(BaseLevel.getMenuOption().equals("Meditate") && !isMoveOnCooldown[1]) {
+				else if(BaseLevel.getMenuOption().equals("Meditate") && !isMoveOnCooldown[2]) {
 					meditate();
-					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Power Punch") && !isSpellOnCooldown[0]) {
+				else if(BaseLevel.getMenuOption().equals("Power Punch") && !isSpellOnCooldown.elementAt(0)) {
 					powerPunch();
-					BaseLevel.changeMenuSelect("RIGHT");
 					spellMenu = false;
 				}
-				else if(BaseLevel.getMenuOption().equals("Cleanse") && !isSpellOnCooldown[1]) {
+				else if(BaseLevel.getMenuOption().equals("Cleanse") && !isSpellOnCooldown.elementAt(1)) {
 					cleanse();
-					BaseLevel.changeMenuSelect("RIGHT");
 					spellMenu = false;
 				}
-			}
-			if(k == KeyEvent.VK_LEFT) {
-				if(baseMenu) {
-					attacking = false;
-					BaseLevel.dequeueTurn();
-					BaseLevel.enqueueTurn(this);
-				}
-				else {
-					spellMenu = false;
-					baseMenu = true;
-				}
-			BaseLevel.changeMenuSelect("LEFT");
+				BaseLevel.changeMenuSelect("RIGHT");
+				menuSelect = 0;
+				menuOption = 0;
 			}
 		}
 	}
@@ -168,6 +119,7 @@ public class Monk extends BaseCharacter{
 		attacking = false;
 		queued = false;
 		BaseLevel.dequeueTurn();
+		rejSound.play();
 	}
 	
 	public void powerPunch() {
@@ -176,6 +128,7 @@ public class Monk extends BaseCharacter{
 		queued = false;
 		mp--;
 		attack((int)(attack * 2));
+		strongAttackSound.play();
 	}
 	
 	public void cleanse() {
@@ -185,6 +138,7 @@ public class Monk extends BaseCharacter{
 		mp--;
 		heal(maxHp / 4);
 		BaseLevel.dequeueTurn();
+		rejSound.play();
 	}
 
 }

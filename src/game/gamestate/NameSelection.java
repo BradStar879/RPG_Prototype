@@ -4,11 +4,17 @@ import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
+
+import physics.Sounds;
 
 public class NameSelection extends GameState{
 	
@@ -20,6 +26,8 @@ public class NameSelection extends GameState{
 	int currentSpace;
 	boolean isShiftPressed;
 	char[] name;
+	Sounds menuSelectSound = new Sounds("Sounds/menu select.wav");
+	Sounds menuBackSound = new Sounds("Sounds/menu back.wav");
 
 	public NameSelection(GameStateManager gsm) {
 		super(gsm);
@@ -33,6 +41,13 @@ public class NameSelection extends GameState{
 		isShiftPressed = false;
 		name = new char[10];
 		for(int i = 0; i < 10; i++) name[i] = ' ';
+		try {
+		     GraphicsEnvironment ge = 
+		         GraphicsEnvironment.getLocalGraphicsEnvironment();
+		     ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("pixelmix.ttf")));
+		} catch (IOException|FontFormatException e) {
+		     //Handle exception
+		}
 		
 	}
 
@@ -62,7 +77,7 @@ public class NameSelection extends GameState{
 	public void keyPressed(int k) {
 		
 		if(k == KeyEvent.VK_ENTER) {
-			
+			menuSelectSound.play();
 			String nameString = "";
 			for(int i = 0; i < 10; i++) nameString += name[i];
 			ClassSelection.names[ClassSelection.selected] = nameString;
@@ -71,7 +86,7 @@ public class NameSelection extends GameState{
 		}
 		
 		if(k == KeyEvent.VK_ESCAPE) {
-			
+			menuBackSound.play();
 			ClassSelection.names[ClassSelection.selected] = "";
 			ClassSelection.classesSelected[ClassSelection.selected] = "";
 			gsm.states.pop();

@@ -3,18 +3,27 @@ package game.gamestate;
 import game.main.GamePanel;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 
+import physics.Sounds;
 import player.CharacterStats;
 import player.Inventory;
 import player.PlayerMover;
 import world.BaseWorldBlock;
 import world.GrassBlock;
+import world.SandBlock;
+import world.StartingCityBlock;
+import world.StartingCityBlockBlank;
 import world.WaterBlock;
 import Cities.CastleWall;
 import Cities.Gravel;
@@ -35,6 +44,8 @@ public class World extends GameState{
 	public int blockSize;
 	public int wd;
 	public int ht;
+	public int edgeX;
+	public int edgeY;
 	public int battleProb;
 	public static boolean loading = false;
 	boolean battle;
@@ -57,6 +68,9 @@ public class World extends GameState{
 	public Image walkerLeft;
 	
 	public WorldPauseDisplay pDisplay;
+	public static Sounds bgm;
+	public Sounds enterBattle;
+	public Sounds stepSound;
 
 	public World(GameStateManager gsm) {
 		super(gsm);
@@ -68,16 +82,18 @@ public class World extends GameState{
 		
 		wd = GamePanel.WIDTH;
 		ht = GamePanel.HEIGHT;
+		edgeX = 11;
+		edgeY = 6;
 		blockSize = ht / 12;
 		if(!loading) {
 			shiftX = 8;
 			shiftY = 8;
-			player = new PlayerMover(Color.BLACK, shiftX + 11, shiftY + 6, 0);
+			player = new PlayerMover(Color.BLACK, shiftX + edgeX, shiftY + edgeY, 0);
 			inv = new Inventory();
 		}
 		else {
-			shiftX = player.x - 11;
-			shiftY = player.y - 6;
+			shiftX = player.x - edgeX;
+			shiftY = player.y - edgeY;
 		}
 		dir = 0;
 		moveTime = 0;
@@ -98,14 +114,17 @@ public class World extends GameState{
 		walkerRight = new ImageIcon("Sprites/WalkerRight.png").getImage();
 		walkerDown = new ImageIcon("Sprites/WalkerDown.png").getImage();
 		walkerLeft = new ImageIcon("Sprites/WalkerLeft.png").getImage();
-		inv.addItem("Fire Arrow");
-		inv.addItem("Fire Arrow");
-		inv.addItem("Fire Arrow");
-		inv.addItem("Cloth Robe");
-		inv.addItem("Cloth Cloak");
-		inv.addItem("Wood Sword");
-		inv.addItem("Wood Staff");
-		
+		try {
+		     GraphicsEnvironment ge = 
+		         GraphicsEnvironment.getLocalGraphicsEnvironment();
+		     ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("pixelmix.ttf")));
+		} catch (IOException|FontFormatException e) {
+		     //Handle exception
+		}
+		bgm = new Sounds("Music/plainstheme.wav");
+		enterBattle = new Sounds("Music/enteringbattle.wav");
+		stepSound = new Sounds("Sounds/short grass walk.wav");
+		bgm.loop();
 	}
 
 	
@@ -122,7 +141,8 @@ public class World extends GameState{
 							world[i][j].set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 						}
 					}
-					battleChance();
+					if(world[player.y][player.x].enter) enterCity();
+					else battleChance();
 				}
 				else {
 					for(int i = 0; i < worldHeight; i++) {
@@ -141,7 +161,8 @@ public class World extends GameState{
 							world[i][j].set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 						}
 					}
-					battleChance();
+					if(world[player.y][player.x].enter) enterCity();
+					else battleChance();
 				}
 				else {
 					for(int i = 0; i < worldHeight; i++) {
@@ -160,7 +181,8 @@ public class World extends GameState{
 							world[i][j].set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 						}
 					}
-					battleChance();
+					if(world[player.y][player.x].enter) enterCity();
+					else battleChance();
 				}
 				else {
 					for(int i = 0; i < worldHeight; i++) {
@@ -179,7 +201,8 @@ public class World extends GameState{
 							world[i][j].set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 						}
 					}
-					battleChance();
+					if(world[player.y][player.x].enter) enterCity();
+					else battleChance();
 				}
 				else {
 					for(int i = 0; i < worldHeight; i++) {
@@ -207,8 +230,6 @@ public class World extends GameState{
 			}
 		}
 		
-		//g.setColor(Color.BLACK);
-		//g.fillRect(blockSize * 11 + blockSize / 4,  blockSize * 6 + blockSize / 4, blockSize / 2, blockSize / 2);
 		if(dir == 0) g.drawImage(walkerUp, blockSize * 11,  blockSize * 6, blockSize, blockSize, null);
 		else if(dir == 1) g.drawImage(walkerRight, blockSize * 11,  blockSize * 6, blockSize, blockSize, null);
 		else if(dir == 2) g.drawImage(walkerDown, blockSize * 11,  blockSize * 6, blockSize, blockSize, null);
@@ -223,32 +244,36 @@ public class World extends GameState{
 	
 	public void keyPressed(int k) {
 		if(!moving && !battle && !paused) {
-			if(k == KeyEvent.VK_W) {
+			if(k == KeyEvent.VK_W && player.y - edgeY - 1 >= 0) {
 				moving = true;
 				moveTime = 60;
 				dir = 0;
 				player.steps++;
+				stepSound.play();
 			}
-			else if(k == KeyEvent.VK_D) {
+			else if(k == KeyEvent.VK_D && player.x + edgeX + 1 <= worldLength) {
 				moving = true;
 				moveTime = 60;
 				dir = 1;
 				player.steps++;
+				stepSound.play();
 			}
-			else if(k == KeyEvent.VK_S) {
+			else if(k == KeyEvent.VK_S && player.y + edgeY + 1 <= worldHeight) {
 				moving = true;
 				moveTime = 60;
 				dir = 2;
 				player.steps++;
+				stepSound.play();
 			}
-			else if(k == KeyEvent.VK_A) {
+			else if(k == KeyEvent.VK_A && player.x - edgeX - 1 >= 0) {
 				moving = true;
 				moveTime = 60;
 				dir = 3;
 				player.steps++;
+				stepSound.play();
 			}
-			//else if(k == KeyEvent.VK_Q) battle = true;
-			//else if(k == KeyEvent.VK_E) enterCity();
+			else if(k == KeyEvent.VK_Q) battle = true;
+			else if(k == KeyEvent.VK_E) enterCity();
 		}
 		if(k == KeyEvent.VK_ESCAPE && !battle && !paused) {
 			paused = true;
@@ -274,12 +299,15 @@ public class World extends GameState{
 			for(int j = 0; j < w; j++) {
 				
 				int pixel = image.getRGB(j, i);
-				//int r = (pixel >> 16) & 0xff;
+				int r = (pixel >> 16) & 0xff;
 				int g = (pixel >> 8) & 0xff;
 				int b = (pixel) & 0xff;
 				
 				if(b == 255) world[i][j] = new WaterBlock(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
+				else if(r == 239) world[i][j] = new SandBlock(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 				else if(g == 255) world[i][j] = new GrassBlock(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
+				else if(r == 255) world[i][j] = new StartingCityBlock(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
+				else if(r == 0) world[i][j] = new StartingCityBlockBlank(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 				else if(g == 195) world[i][j] = new Gravel(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 				else if(g == 73) world[i][j] = new CastleWall(blockSize).set(j * blockSize - (shiftX * blockSize), i * blockSize - (shiftY * blockSize));
 			}
@@ -287,6 +315,7 @@ public class World extends GameState{
 	}
 	
 	public void enterCity() {
+		bgm.stop();
 		gsm.states.push(new StartingCity(gsm));
 	}
 	
@@ -294,6 +323,8 @@ public class World extends GameState{
 		if(Math.random() * 100 < battleProb && player.steps > 4) {
 			player.steps = 0;
 			battle = true;
+			bgm.stop();
+			enterBattle.play();
 		}
 	}
 	
@@ -305,6 +336,7 @@ public class World extends GameState{
 	}
 	
 	public static void exit() {
+		bgm.stop();
 		exit = true;
 	}
 	

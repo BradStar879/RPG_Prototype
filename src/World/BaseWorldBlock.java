@@ -10,6 +10,7 @@ public class BaseWorldBlock {
 	public int wd;
 	int ht = GamePanel.HEIGHT / 12;
 	public boolean walkable;
+	public boolean enter;
 	public int x;
 	public int y;
 	Image blockType;

@@ -7,7 +7,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.util.Vector;
 
+import physics.Sounds;
 import display.BufferedImageLoader;
 
 public class BaseCharacter {
@@ -54,20 +56,29 @@ public class BaseCharacter {
 	Image arrow;
 	Image sprite;
 	
+	int menuSelect;
+	int menuOption;
 	String[] moveSet;
 	boolean[] isMoveOnCooldown;
 	int[] moveCooldown;
+	int[] moveMpCost;
 	boolean baseMenu;
 	
-	String[] spellSet;
-	boolean[] isSpellOnCooldown;
-	int[] spellCooldown;
+	Vector<Spells> spells;
+	Vector<String> spellSet;
+	Vector<Boolean> isSpellOnCooldown;
+	Vector<Integer> spellCooldown;
 	boolean spellMenu;
+	int numSpells;
+	
+	boolean invMenu;
 	
 	int regenCount;
 	int regenAmount;
 	
 	public String mpName;
+	
+	Sounds damageSound = new Sounds("Sounds/playerattacked.wav");
 	
 	public BaseCharacter(int num, int pos, Color col) {
 		this.num = num;
@@ -75,7 +86,8 @@ public class BaseCharacter {
 		this.col = col;
 	}
 	
-	public BaseCharacter(int num, int pos, Color col, String name, int level, int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor, int spellPower) {
+	public BaseCharacter(int num, int pos, Color col, String name, int level, int hp, int maxHp, int mp,
+			int maxMp, int speed, int attack, int armor, int spellPower, Vector<Spells> spells) {
 		this.num = num;
 		this.pos = pos;
 		this.col = col;
@@ -90,6 +102,7 @@ public class BaseCharacter {
 		this.attack = attack;
 		this.armor = armor;
 		this.spellPower = spellPower;
+		this.spells = spells;
 	}
 	
 	public void init() {
@@ -101,7 +114,7 @@ public class BaseCharacter {
 		gmHt = GamePanel.HEIGHT;
 		wd = GamePanel.HEIGHT / 24;
 		ht = GamePanel.HEIGHT / 12;
-		time = (int)(Math.random() * 201 + 0);
+		time = (int)(Math.random() * 301 + 0);
 		timeMax = 60000;
 		rowCoord0 = gmHt * 7 / 16;
 		rowCoord1 = gmHt * 89 / 144;
@@ -112,17 +125,35 @@ public class BaseCharacter {
 		floatCount = 0;
 		lane = pos % 3;
 		distance = pos / 3;
+		menuSelect = 0;
+		menuOption = 0;
+		numSpells = 0;
 		
 		
-		moveSet = new String[]{"Attack", "Magic", "", "Item"};
+		moveSet = new String[]{"Attack", "", "", "Item"};
 		isMoveOnCooldown = new boolean[]{false, false, false, false};
 		moveCooldown = new int[]{0, 0, 0, 0};
+		moveMpCost = new int[]{0, 0, 0, 0};
 		baseMenu = true;
 		
-		spellSet = new String[]{"", "", "", ""};
-		isSpellOnCooldown = new boolean[]{false, false, false, false};
-		spellCooldown = new int[]{0, 0, 0, 0};
+		spellSet = new Vector<String>();
+		isSpellOnCooldown = new Vector<Boolean>();
+		spellCooldown = new Vector<Integer>();
 		spellMenu = false;
+		invMenu = false;
+		
+		for(int i = 1; i < spells.size(); i++) {
+			spellSet.add(spells.elementAt(i).name);
+			spellCooldown.add(0);
+			isSpellOnCooldown.add(false);
+			numSpells++;
+		}
+		while(spellSet.size() < 4) {
+			spells.add(new Spells(""));
+			spellSet.add("");
+			spellCooldown.add(0);
+			isSpellOnCooldown.add(false);
+		}
 		
 	}
 	
@@ -157,11 +188,6 @@ public class BaseCharacter {
 				BaseLevel.charSelectForward();
 			}
 		}
-
-		if(attacking && baseMenu) BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
-				isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
-		else if(attacking && spellMenu) BaseLevel.changeMenuOptions(spellSet[0], spellSet[1], spellSet[2], spellSet[3], 
-				isSpellOnCooldown[0], isSpellOnCooldown[1], isSpellOnCooldown[2], isSpellOnCooldown[3]);
 		
 		floatCount++;
 		if(floatCount >= 120) floatCount = 0;
@@ -179,6 +205,26 @@ public class BaseCharacter {
 			if(regenCount % 180 == 0) hp += regenAmount;
 			if(hp > maxHp) hp = maxHp;
 		}
+		
+		for(int i = 0; i < 4; i++) {
+			if(moveCooldown[i] > 0) {
+				moveCooldown[i]--;
+			}
+			else if(mp < moveMpCost[i]) isMoveOnCooldown[i] = true;
+			else isMoveOnCooldown[i] = false;
+		}
+		for(int i = 0; i < isSpellOnCooldown.size(); i++) {
+			if(spellCooldown.elementAt(i) > 0) {
+				spellCooldown.set(i, spellCooldown.elementAt(i) - 1);
+			}
+			else if(mp < spells.elementAt(i+1).mpCost) isSpellOnCooldown.set(i, true);
+			else isSpellOnCooldown.set(i, false);
+		}
+		if(attacking && baseMenu) BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
+				isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
+		else if(attacking && spellMenu)
+			BaseLevel.changeMenuOptions(spellSet.elementAt(menuOption-menuSelect), spellSet.elementAt(menuOption-menuSelect+1), spellSet.elementAt(menuOption-menuSelect+2), spellSet.elementAt(menuOption-menuSelect+3), 
+					isSpellOnCooldown.elementAt(menuOption-menuSelect), isSpellOnCooldown.elementAt(menuOption-menuSelect+1), isSpellOnCooldown.elementAt(menuOption-menuSelect+2), isSpellOnCooldown.elementAt(menuOption-menuSelect+3));
 	}
 	
 	
@@ -231,7 +277,6 @@ public class BaseCharacter {
 							g.fillRect(x - gmHt / 36 + (gmHt * j / 9 / 20), y - gmHt / 24 + (gmHt * i / 6 / 40), gmHt / 9 / 20, gmHt / 6 / 40);
 					}
 				}
-				//g.fillRect(x - gmHt / 36, y - gmHt / 24, gmHt / 9, gmHt / 6);
 			}
 			else if(distance == 1) {
 				for(int i = 0; i < 40; i++) {
@@ -240,7 +285,6 @@ public class BaseCharacter {
 							g.fillRect(x - gmHt / 26 + (int)(gmHt * j / 7.5 / 20), y - gmHt / 12 + (gmHt * i / 5 / 40), (int)(gmHt / 7.5 / 20), (gmHt / 5 / 40));
 					}
 				}
-				//g.fillRect(x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5);
 			}
 			else {
 				for(int i = 0; i < 40; i++) {
@@ -249,15 +293,12 @@ public class BaseCharacter {
 							g.fillRect(x - gmHt / 19 + (gmHt * j / 6 / 20), y - gmHt / 10 + (gmHt * i / 4 / 40), (gmHt / 6 / 20), (gmHt / 4 / 40));
 					}
 				}
-				//g.fillRect(x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4);
 			}
 		}
 		
 		if(distance == 0) g.drawImage(sprite, x - gmHt / 36, y - gmHt / 24, null);
 		else if(distance == 1) g.drawImage(sprite, x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5, null);
 		else g.drawImage(sprite, x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4, null);
-			
-		//g.fillRect(x, y, wd, ht);
 		
 		if(attacking) {
 			if(distance == 0) g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 12 - (arrowFloat / 2), gmHt / 48, gmHt / 24, null);
@@ -294,21 +335,47 @@ public class BaseCharacter {
 			
 			}
 		
-		
 		if(attacking){
-			if(k == KeyEvent.VK_UP) BaseLevel.changeMenuSelect("UP");
-			if(k == KeyEvent.VK_DOWN) BaseLevel.changeMenuSelect("DOWN");
-			if(k == KeyEvent.VK_RIGHT) {
-				if(BaseLevel.getMenuOption().equals("Attack")) {
-					attack(attack);
+			if(k == KeyEvent.VK_UP) {
+				if(spellMenu && menuOption != 0 && menuSelect == 0) {
+					menuOption--;
+					BaseLevel.changeMenuOptions(spellSet.elementAt(menuOption), spellSet.elementAt(menuOption+1), spellSet.elementAt(menuOption+2), spellSet.elementAt(menuOption+3), 
+							isSpellOnCooldown.elementAt(menuOption), isSpellOnCooldown.elementAt(menuOption+1), isSpellOnCooldown.elementAt(menuOption+2), isSpellOnCooldown.elementAt(menuOption+3));
 				}
-				BaseLevel.changeMenuSelect("RIGHT");
+				else if(menuSelect != 0) {
+					BaseLevel.changeMenuSelect("UP");
+					menuSelect--;
+					menuOption--;
+				}
 			}
-			if(k == KeyEvent.VK_LEFT && baseMenu) {
+			if(k == KeyEvent.VK_DOWN) {
+				if(spellMenu && menuOption != numSpells - 1 && menuSelect == 3) {
+					menuOption++;
+					BaseLevel.changeMenuOptions(spellSet.elementAt(menuOption-3), spellSet.elementAt(menuOption-2), spellSet.elementAt(menuOption-1), spellSet.elementAt(menuOption), 
+							isSpellOnCooldown.elementAt(menuOption-3), isSpellOnCooldown.elementAt(menuOption-2), isSpellOnCooldown.elementAt(menuOption-1), isSpellOnCooldown.elementAt(menuOption));
+				}
+				else if(menuSelect != 3 && !(spellMenu && menuOption == numSpells - 1)) {
+					BaseLevel.changeMenuSelect("DOWN");
+					menuSelect++;
+					menuOption++;
+				}
+			}
+			if(k == KeyEvent.VK_LEFT) {
+				if(baseMenu) {
+					attacking = false;
+					BaseLevel.dequeueTurn();
+					BaseLevel.enqueueTurn(this);
+				}
+				else {
+					spellMenu = false;
+					invMenu = false;
+					baseMenu = true;
+					BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
+							isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
+				}
 				BaseLevel.changeMenuSelect("LEFT");
-				attacking = false;
-				BaseLevel.dequeueTurn();
-				BaseLevel.enqueueTurn(this);
+				menuSelect = 0;
+				menuOption = 0;
 			}
 		}
 	}
@@ -413,6 +480,7 @@ public class BaseCharacter {
 		if(hp <= 0) {
 			hp = 0;
 		}
+		damageSound.play();
 	}
 	
 	public void heal(int amount) {
@@ -468,12 +536,12 @@ public class BaseCharacter {
 		int k = 0;
 		int j = 0;
 		for(int i = 0; i < 4; i++) {
-			if(isSpellOnCooldown[i]) k++;
+			if(isSpellOnCooldown.elementAt(i)) k++;
 		}
 		String[] temp = new String[k];
 		for(int i = 0; i < 4; i++) {
-			if(isSpellOnCooldown[i]) {
-				temp[j] = spellSet[i];
+			if(isSpellOnCooldown.elementAt(i)) {
+				temp[j] = spellSet.elementAt(i);
 				j++;
 			}
 		}
@@ -485,12 +553,12 @@ public class BaseCharacter {
 		int k = 0;
 		int j = 0;
 		for(int i = 0; i < 4; i++) {
-			if(isSpellOnCooldown[i]) k++;
+			if(isSpellOnCooldown.elementAt(i)) k++;
 		}
 		int[] temp = new int[k];
 		for(int i = 0; i < 4; i++) {
-			if(isSpellOnCooldown[i]) {
-				temp[j] = spellCooldown[i] / 60 + 1;
+			if(isSpellOnCooldown.elementAt(i)) {
+				temp[j] = spellCooldown.elementAt(i) / 60 + 1;
 				j++;
 			}
 		}
@@ -499,9 +567,9 @@ public class BaseCharacter {
 	
 	public int getCurrentCooldown() {
 		for(int i = 0; i < moveSet.length; i++)
-			if(BaseLevel.getMenuOption().equals(moveSet[i])) return moveCooldown[i] / 60;
-		for(int i = 0; i < spellSet.length; i++)
-			if(BaseLevel.getMenuOption().equals(spellSet[i])) return spellCooldown[i] / 60;
+			if(BaseLevel.getMenuOption().equals(moveSet[i])) return (moveCooldown[i] + 59) / 60;
+		for(int i = 0; i < spellSet.size(); i++)
+			if(BaseLevel.getMenuOption().equals(spellSet.elementAt(i))) return (spellCooldown.elementAt(i) + 59) / 60;
 		return 0;
 	}
 	

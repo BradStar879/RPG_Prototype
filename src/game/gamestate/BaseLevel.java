@@ -4,9 +4,13 @@ import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -15,6 +19,7 @@ import javax.swing.ImageIcon;
 import mobs.BaseMob;
 import mobs.Bunny;
 import mobs.Pig;
+import physics.Sounds;
 import player.CharacterStats;
 import characters.Archer;
 import characters.BaseCharacter;
@@ -35,7 +40,7 @@ import display.WinScreen;
 
 public class BaseLevel extends GameState{
 	static short charSelect;
-	static short menuSelect;
+	public static short menuSelect;
 	int ht;
 	int wd;
 	int border;
@@ -66,6 +71,8 @@ public class BaseLevel extends GameState{
 	Image menuBox;
 	Image sideArrow;
 	Image background;
+	static Sounds bgm;
+	Sounds vicTheme;
 	
 	
 	public CoordinateTester test;
@@ -117,6 +124,9 @@ public class BaseLevel extends GameState{
 		sideArrow = loader.loadImage("/SideArrow.png").getScaledInstance(ht / 40, border, Image.SCALE_SMOOTH);
 		menuBox = new ImageIcon("Sprites/MenuBox.png").getImage();
 		background = new ImageIcon("Sprites/GrassLandBackground2.png").getImage();
+		bgm = new Sounds("Music/plainsbattletheme.wav");
+		vicTheme = new Sounds("Music/victorytheme.wav");
+		bgm.loop();
 		
 		mobInLane = new boolean[3];
 		for(int i = 0; i < 3; i++) mobInLane[i] = true;
@@ -130,22 +140,22 @@ public class BaseLevel extends GameState{
 		for(int i = 0; i < 3; i++) {
 		if(team[i].className.equals("Warrior")) chars[i] = new Warrior(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp, 
 				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor +
-				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower, team[i].spells);
 		else if(team[i].className.equals("Black Mage")) chars[i] = new BlackMage(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp,
 				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor + 
-				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower, team[i].spells);
 		else if(team[i].className.equals("White Mage")) chars[i] = new WhiteMage(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp, 
 				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor + 
-				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower, team[i].spells);
 		else if(team[i].className.equals("Archer")) chars[i] = new Archer(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp,
 				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor +
-				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower, team[i].spells);
 		else if(team[i].className.equals("Spearman")) chars[i] = new Spearman(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp, 
 				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor + 
-				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower, team[i].spells);
 		else if(team[i].className.equals("Monk")) chars[i] = new Monk(i, i + 3, Color.RED, team[i].name, team[i].level, team[i].hp,
 				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor + 
-				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower);
+				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower, team[i].spells);
 		}
 			
 		for(int i = 0; i < 3; i++) {
@@ -187,15 +197,33 @@ public class BaseLevel extends GameState{
 		menuOptions = new String[]{"", "", "", ""};
 		onCooldown = new boolean[]{false, false, false, false};
 		attackQueue = new LinkedList<BaseCharacter>();
+		try {
+		     GraphicsEnvironment ge = 
+		         GraphicsEnvironment.getLocalGraphicsEnvironment();
+		     ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("pixelmix.ttf")));
+		} catch (IOException|FontFormatException e) {
+		     //Handle exception
+		}
+		
 	}
 
 	
 	public void tick() {
-		if(exit) gsm.states.pop();
-		if(!mobInLane[0] && !mobInLane[1] && !mobInLane[2]) won = true;
-		if(!chars[0].getAlive() && !chars[1].getAlive() && !chars[2].getAlive()) lost = true;
+		if(exit) {
+			bgm.stop();
+			gsm.states.pop();
+			World.bgm.loop();
+		}
+		if(!mobInLane[0] && !mobInLane[1] && !mobInLane[2] && !won) {
+			bgm.stop();
+			vicTheme.play();
+			won = true;
+		}
+		if(!chars[0].getAlive() && !chars[1].getAlive() && !chars[2].getAlive() && !lost) {
+			bgm.stop();
+			lost = true;
+		}
 		if(!won && !lost && !paused) {
-			//test.tick();
 			for(int i = 0; i < 3; i++){
 				chars[i].tick();
 				mob[i].tick();
@@ -221,6 +249,7 @@ public class BaseLevel extends GameState{
 			battleEnd--;
 			if(battleEnd == 0) {
 				gsm.states.pop();
+				World.bgm.loop();
 			}
 		}
 		else if(lost) {
@@ -284,6 +313,7 @@ public class BaseLevel extends GameState{
 				charSelectBack();
 			}
 			if(k == KeyEvent.VK_ESCAPE) {
+				bgm.stop();
 				paused = true;
 				pDisplay.pause();
 			}
@@ -431,6 +461,7 @@ public class BaseLevel extends GameState{
 	}
 	
 	public static void unpause() {
+		bgm.resume();
 		paused = false;
 	}
 	

@@ -5,13 +5,18 @@ import game.main.GamePanel;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 
+import physics.Sounds;
 import player.Saver;
 
 
@@ -26,6 +31,7 @@ public class MenuState extends GameState{
 	int ht;
 	int loadTime;
 	float alpha;
+	Sounds menuSelectSound = new Sounds("Sounds/menu select.wav");
 	
 	public MenuState(GameStateManager gsm) {
 		super(gsm);
@@ -39,6 +45,13 @@ public class MenuState extends GameState{
 		options = new String[]{"New Game", "Load Game", "Help", "Quit"};
 		currentSelection = 0;
 		menuScreen = new ImageIcon("Sprites/MenuScreen.png").getImage();
+		try {
+		     GraphicsEnvironment ge = 
+		         GraphicsEnvironment.getLocalGraphicsEnvironment();
+		     ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("pixelmix.ttf")));
+		} catch (IOException|FontFormatException e) {
+		     //Handle exception
+		}
 	}
 
 	public void tick() {
@@ -106,13 +119,18 @@ public class MenuState extends GameState{
 			}*/
 			else if(k == KeyEvent.VK_ENTER){
 				if(currentSelection == 0){
+					menuSelectSound.play();
 					gsm.states.push(new ClassSelection(gsm));
 				}
 				else if(currentSelection == 1) {
 					saver.load();
-					if(isSavedGame) gsm.states.push(new World(gsm));
+					if(isSavedGame) {
+						menuSelectSound.play();
+						gsm.states.push(new World(gsm));
+					}
 				}
 				else if(currentSelection == 2){
+					menuSelectSound.play();
 					gsm.states.push(new Help(gsm));
 				}
 				else if(currentSelection == 3){

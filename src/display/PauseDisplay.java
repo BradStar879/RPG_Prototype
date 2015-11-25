@@ -12,6 +12,8 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
 
+import physics.Sounds;
+
 public class PauseDisplay {
 	
 	int ht = GamePanel.HEIGHT;
@@ -22,6 +24,8 @@ public class PauseDisplay {
 	BufferedImageLoader loader = new BufferedImageLoader();
 	Image sideArrow = loader.loadImage("/SideArrow.png").getScaledInstance(border * 2, border, Image.SCALE_SMOOTH);
 	Image pauseBox = new ImageIcon("Sprites/PauseBox.png").getImage();
+	Sounds menuSelectSound = new Sounds("Sounds/menu select.wav");
+	Sounds menuBackSound = new Sounds("Sounds/menu back.wav");
 	
 	boolean paused = false;
 	String[] pauseOptions = new String[]{"Resume", "Options", "Quit"};
@@ -58,10 +62,11 @@ public class PauseDisplay {
 				if(pauseSelect == 0) {
 					unpause();
 					BaseLevel.unpause();
+					menuSelectSound.play();
 				}
 				else if(pauseSelect == 1) ;
 				else if(pauseSelect == 2) {
-					
+					menuBackSound.play();
 					BaseLevel.exit();
 				}
 			}

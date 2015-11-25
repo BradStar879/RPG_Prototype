@@ -4,12 +4,17 @@ import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 
+import physics.Sounds;
 import player.CharacterStats;
 import display.BufferedImageLoader;
 
@@ -38,6 +43,8 @@ public class ClassSelection extends GameState{
 	Image background = new ImageIcon("Sprites/CharacterSelectionScreen.png").getImage();
 	Image arrow = loader.loadImage("/SideArrow.png").getScaledInstance(wd / 20, wd / 40, Image.SCALE_SMOOTH);
 	Image rDisplay = new ImageIcon("Sprites/PauseBox.png").getImage();
+	Sounds menuSelectSound = new Sounds("Sounds/menu select.wav");
+	Sounds menuBackSound = new Sounds("Sounds/menu back.wav");
 
 	public ClassSelection(GameStateManager gsm) {
 		super(gsm);
@@ -58,6 +65,13 @@ public class ClassSelection extends GameState{
 		names = new String[]{"", "", ""};
 		readyMenu = false;
 		cursor = 0;
+		try {
+		     GraphicsEnvironment ge = 
+		         GraphicsEnvironment.getLocalGraphicsEnvironment();
+		     ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("pixelmix.ttf")));
+		} catch (IOException|FontFormatException e) {
+		     //Handle exception
+		}
 		
 	}
 
@@ -124,12 +138,13 @@ public class ClassSelection extends GameState{
 				else classSelect -= 3;
 			}
 			if(k == KeyEvent.VK_ENTER) {
-			
+					menuSelectSound.play();
 					classesSelected[selected] = classes[classSelect];
 					gsm.states.push(new NameSelection(gsm));
 				
 			}
 			if(k == KeyEvent.VK_ESCAPE) {
+				menuBackSound.play();
 				gsm.states.pop();
 			}
 		}
@@ -138,6 +153,7 @@ public class ClassSelection extends GameState{
 			if(k == KeyEvent.VK_RIGHT || k == KeyEvent.VK_LEFT) cursor++;
 			if(k == KeyEvent.VK_ENTER) {
 				if(cursor == 0) {
+					menuSelectSound.play();
 					char1 = new CharacterStats(names[0], classesSelected[0]);
 					char2 = new CharacterStats(names[1], classesSelected[1]);
 					char3 = new CharacterStats(names[2], classesSelected[2]);
@@ -147,6 +163,7 @@ public class ClassSelection extends GameState{
 					gsm.states.push(new World(gsm));
 				}
 				else {
+					menuSelectSound.play();
 					readyMenu = false;
 					selected = 0;
 					for(int i = 0; i < 3; i++) {

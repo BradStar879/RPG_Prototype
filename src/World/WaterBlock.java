@@ -13,6 +13,7 @@ public class WaterBlock extends BaseWorldBlock{
 	public WaterBlock(int wd) {
 		this.wd = wd;
 		walkable = false;
+		enter = false;
 	}
 	
 	public void draw(Graphics g) {

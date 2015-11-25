@@ -4,10 +4,16 @@ import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
+
+import physics.Sounds;
 
 import com.sun.glass.events.KeyEvent;
 
@@ -40,6 +46,8 @@ public class Help extends GameState{
 	Image spearman = new ImageIcon("ScreenShots/SpearmanShot.png").getImage();
 	Image warrior = new ImageIcon("ScreenShots/WarriorShot.png").getImage();
 	Image whiteMage = new ImageIcon("ScreenShots/WhiteMageShot.png").getImage();
+	Sounds menuSelectSound = new Sounds("Sounds/menu select.wav");
+	Sounds menuBackSound = new Sounds("Sounds/menu back.wav");
 	
 	
 	public Help(GameStateManager gsm) {
@@ -50,6 +58,13 @@ public class Help extends GameState{
 	public void init() {
 		currentSelection = 0;
 		helpScreen = 0;
+		try {
+		     GraphicsEnvironment ge = 
+		         GraphicsEnvironment.getLocalGraphicsEnvironment();
+		     ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("pixelmix.ttf")));
+		} catch (IOException|FontFormatException e) {
+		     //Handle exception
+		}
 		
 	}
 
@@ -197,7 +212,10 @@ public class Help extends GameState{
 
 	
 	public void keyPressed(int k) {
-		if(k == KeyEvent.VK_ESCAPE) gsm.states.pop();
+		if(k == KeyEvent.VK_ESCAPE) {
+			menuBackSound.play();
+			gsm.states.pop();
+		}
 		if(helpScreen == 0) {
 			if(k == KeyEvent.VK_DOWN){
 				currentSelection++;
@@ -212,6 +230,7 @@ public class Help extends GameState{
 				}
 			}
 			else if(k == KeyEvent.VK_ENTER) {
+				menuSelectSound.play();
 				if(currentSelection == 0) helpScreen = 1;
 				else if(currentSelection == 1) helpScreen = 6;
 				else if(currentSelection == 2) helpScreen = 12;

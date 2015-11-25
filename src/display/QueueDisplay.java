@@ -45,10 +45,10 @@ public class QueueDisplay {
 					g.drawString(spell.name,  wd - queueWd + border * 2,  ht - (queueHt * 2) + border * 6);
 					if(spell.mpCost != -1) {
 						g.drawString(disQueue[j].mpName + ": " + spell.mpCost,  wd - queueWd + border * 2,  ht - queueHt * 2 + border * 8);
-						g.drawString("Cd: " + spell.cooldown / 60 + " sec",  wd - queueWd + border * 2,  ht - queueHt * 2 + border * 10);
+						g.drawString("Cd: " + spell.cooldown / 60  + " sec",  wd - queueWd + border * 2,  ht - queueHt * 2 + border * 10);
 					}
 					if(disQueue[j].getCurrentCooldown() != 0) {
-						g.drawString("Cd left: " + (disQueue[j].getCurrentCooldown() + 1), wd - queueWd + border * 2,  ht - queueHt * 2 + border * 12);
+						g.drawString("Cd left: " + (disQueue[j].getCurrentCooldown()), wd - queueWd + border * 2,  ht - queueHt * 2 + border * 12);
 					}
 				}
 				if(j != 0) g.drawImage(shortQueueBox, wd - queueWd, ht - queueHt * 2 - (j * (ht / 10)), queueWd, ht / 10, null);

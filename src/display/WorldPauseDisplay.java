@@ -13,6 +13,7 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 
 import characters.Spells;
+import physics.Sounds;
 import player.CharacterStats;
 import player.Item;
 import player.Saver;
@@ -41,6 +42,10 @@ public class WorldPauseDisplay {
 	Image purple = new ImageIcon("Sprites/PurpleInfoBar.png").getImage();
 	Image black = new ImageIcon("Sprites/BlackBar.png").getImage();
 	Image health;
+	Sounds menuSelectSound = new Sounds("Sounds/menu select.wav");
+	Sounds menuBackSound = new Sounds("Sounds/menu back.wav");
+	Sounds saveSound = new Sounds("Sounds/save.wav");
+	Sounds itemSound = new Sounds("Sounds/item ability use.wav");
 	
 	boolean paused = false;
 	String[] pauseOptions = new String[]{"Resume", "Abilities", "Inventory", "Save", "Quit"};
@@ -190,12 +195,14 @@ public class WorldPauseDisplay {
 				}
 				if(k == KeyEvent.VK_ENTER) {
 					if(Item.usable(invList[invSelect])) {
+						menuSelectSound.play();
 						item = invList[invSelect];
 						invMenu = false;
 						invCharMenu = true;
 					}
 				}
 				if(k == KeyEvent.VK_ESCAPE) {
+					menuBackSound.play();
 					invSelect = 0;
 					invMenu = false;
 				}
@@ -211,6 +218,7 @@ public class WorldPauseDisplay {
 					else charSelect++;
 				}
 				if(k == KeyEvent.VK_ENTER) {
+					itemSound.play();
 					Item.use(team[charSelect], item);
 					charSelect = 0;
 					invSelect = 0;
@@ -218,6 +226,7 @@ public class WorldPauseDisplay {
 					invCharMenu = false;
 				}
 				if(k == KeyEvent.VK_ESCAPE) {
+					menuBackSound.play();
 					charSelect = 0;
 					invMenu = true;
 					invCharMenu = false;
@@ -233,6 +242,7 @@ public class WorldPauseDisplay {
 					else charSelect++;
 				}
 				if(k == KeyEvent.VK_ENTER) {
+					menuSelectSound.play();
 					abilityMenu = true;
 					preAbilityMenu = false;
 					memberSelected = team[charSelect];
@@ -240,6 +250,7 @@ public class WorldPauseDisplay {
 					charSelect = 0;
 				}
 				if(k == KeyEvent.VK_ESCAPE) {
+					menuBackSound.play();
 					charSelect = 0;
 					preAbilityMenu = false;
 				}
@@ -257,12 +268,14 @@ public class WorldPauseDisplay {
 				}
 				if(k == KeyEvent.VK_ENTER) {
 					if(abilityList.get(abilitySelect).ooc && memberSelected.mp >= abilityList.get(abilitySelect).mpCost) {
+						menuSelectSound.play();
 						ability = new Spells(abilityList.get(abilitySelect).name);
 						abilityMenu = false;
 						abilityCharMenu = true;
 					}
 				}
 				if(k == KeyEvent.VK_ESCAPE) {
+					menuBackSound.play();
 					abilitySelect = 0;
 					abilityMenu = false;
 				}
@@ -277,12 +290,14 @@ public class WorldPauseDisplay {
 					else charSelect++;
 				}
 				if(k == KeyEvent.VK_ENTER) {
+					itemSound.play();
 					ability.useMenuSpell(memberSelected, team[charSelect]);
 					charSelect = 0;
 					abilityMenu = true;
 					abilityCharMenu = false;
 				}
 				if(k == KeyEvent.VK_ESCAPE) {
+					menuBackSound.play();
 					charSelect = 0;
 					abilityMenu = true;
 					abilityCharMenu = false;
@@ -300,23 +315,35 @@ public class WorldPauseDisplay {
 				}
 				if(k == KeyEvent.VK_ENTER) {
 					if(pauseSelect == 0) {
+						menuSelectSound.play();
 						unpause();
 						World.unpause();
 					}
-					else if(pauseSelect == 1) preAbilityMenu = true;
-					else if(pauseSelect == 2) invMenu = true;
+					else if(pauseSelect == 1) {
+						menuSelectSound.play();
+						preAbilityMenu = true;
+					}
+					else if(pauseSelect == 2) {
+						menuSelectSound.play();
+						invMenu = true;
+					}
 					else if(pauseSelect == 3) {
+						saveSound.play();
 						saver.save(World.team, World.player, World.inv);
 						saved = true;
 						saveTick = 120;
 					}
-					else if(pauseSelect == 4) World.exit();
+					else if(pauseSelect == 4) {
+						menuSelectSound.play();
+						World.exit();
+					}
 				}
 			}
 		}
 	}
 	
 	public void pause() {
+		menuSelectSound.play();
 		pauseSelect = 0;
 		paused = true;
 		team = World.team;

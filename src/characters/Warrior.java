@@ -5,18 +5,25 @@ import game.gamestate.BaseLevel;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.util.Vector;
 
 import javax.swing.ImageIcon;
+
+import physics.Sounds;
 
 public class Warrior extends BaseCharacter{
 	
 	boolean block;
 	int stoneSkinCount;
 	int baseArmor;
+	Sounds attackSound = new Sounds("Sounds/warrior sword slash.wav");
+	Sounds strongAttackSound = new Sounds("Sounds/warrior hard sword slash.wav");
+	Sounds shieldDingSound = new Sounds("Sounds/shield ding.wav");
+	Sounds rejSound = new Sounds("Sounds/charging up.wav");
 
 	public Warrior(int num, int pos, Color col, String name, int level, int hp,
-			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack);
+			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack, Vector<Spells> spells) {
+		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack, spells);
 		
 	} 
 	
@@ -28,31 +35,16 @@ public class Warrior extends BaseCharacter{
 		className = "Warrior";
 		mpName = "Rage";
 		range = 1;
-		moveSet[0] = "Attack";
 		moveSet[1] = "Rage Attack";
 		moveSet[2] = "Block";
-		moveSet[3] = "Item";
-		
-		spellSet[0] = "Bash";
-		spellSet[1] = "Stone Skin";
 		
 		block = false;
+		moveMpCost[2] = 15;
 		stoneSkinCount = 0;
 	}
 	
 	public void tick() {
 		super.tick();
-		if(moveCooldown[2] > 0) {
-			moveCooldown[2]--;
-		}
-		else if(mp < 15) isMoveOnCooldown[2] = true;
-		else isMoveOnCooldown[2] = false;
-		
-		if(mp < 25) isSpellOnCooldown[0] = true;
-		else isSpellOnCooldown[0] = false;
-		
-		if(mp < 25) isSpellOnCooldown[1] = true;
-		else isSpellOnCooldown[1] = false;
 		
 		if(stoneSkinCount > 0) {
 			stoneSkinCount--;
@@ -61,75 +53,36 @@ public class Warrior extends BaseCharacter{
 	}
 	
 	public void keyPressed(int k) {
-		if(selected) {
-			if(k == KeyEvent.VK_W && pos > 2 && !BaseLevel.checkPos(pos - 3)) {
-				pos -= 3;
-				BaseLevel.changePos(pos + 3, false);
-				BaseLevel.changePos(pos, true);
-			}
-			if(k == KeyEvent.VK_S && pos < 6 && !BaseLevel.checkPos(pos + 3)) {
-				pos += 3;
-				BaseLevel.changePos(pos - 3, false);
-				BaseLevel.changePos(pos, true);
-			}
-			if(k == KeyEvent.VK_A && pos != 0  && pos != 3 && pos != 6)
-				if (!BaseLevel.checkPos(pos - 1)) {
-					pos -= 1;
-					BaseLevel.changePos(pos + 1, false);
-					BaseLevel.changePos(pos, true);
-				}
-			if(k == KeyEvent.VK_D && pos != 2  && pos != 5 && pos != 8)
-				if (!BaseLevel.checkPos(pos + 1)) {
-					pos += 1;
-					BaseLevel.changePos(pos - 1, false);
-					BaseLevel.changePos(pos, true);
-				}
-			
-			}
-		
-		
+		super.keyPressed(k);
 		if(attacking){
-			if(k == KeyEvent.VK_UP) BaseLevel.changeMenuSelect("UP");
-			if(k == KeyEvent.VK_DOWN) BaseLevel.changeMenuSelect("DOWN");
 			if(k == KeyEvent.VK_RIGHT) {
 				if(BaseLevel.getMenuOption().equals("Attack")) {
-					time = 0;
 					attack(attack);
-					BaseLevel.changeMenuSelect("RIGHT");
+					attackSound.play();
 				}
 				else if(BaseLevel.getMenuOption().equals("Rage Attack")) {
 					baseMenu = false;
 					spellMenu = true;
-					BaseLevel.changeMenuSelect("RIGHT");
+					BaseLevel.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
+						isSpellOnCooldown.elementAt(0), isSpellOnCooldown.elementAt(1), isSpellOnCooldown.elementAt(2), isSpellOnCooldown.elementAt(3));
 				}
 				else if(BaseLevel.getMenuOption().equals("Block") && !isMoveOnCooldown[2]) {
 					time = 0;
 					block();
-					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Bash") && !isSpellOnCooldown[0]) {
+				else if(BaseLevel.getMenuOption().equals("Bash") && !isSpellOnCooldown.elementAt(0)) {
 					time = 0;
 					spellMenu = false;
 					bash();
-					BaseLevel.changeMenuSelect("RIGHT");
 				}
-				else if(BaseLevel.getMenuOption().equals("Bash") && !isSpellOnCooldown[1]) {
+				else if(BaseLevel.getMenuOption().equals("Stone Skin") && !isSpellOnCooldown.elementAt(1)) {
 					time = 0;
 					spellMenu = false;
 					stoneSkin();
-					BaseLevel.changeMenuSelect("RIGHT");
 				}
-			}
-			if(k == KeyEvent.VK_LEFT) {
-				if(baseMenu) {
-					attacking = false;
-					BaseLevel.dequeueTurn();
-					BaseLevel.enqueueTurn(this);
-				}
-				else {
-					baseMenu = true;
-				}
-			BaseLevel.changeMenuSelect("LEFT");
+				BaseLevel.changeMenuSelect("RIGHT");
+				menuSelect = 0;
+				menuOption = 0;
 			}
 		}
 	}
@@ -137,7 +90,10 @@ public class Warrior extends BaseCharacter{
 	public void takeDamage(int damage) {
 		mp += damage * 3 / 5;
 		if(mp > maxMp) mp = maxMp;
-		if(block) block = false;
+		if(block) {
+			block = false;
+			shieldDingSound.play();
+		}
 		else {
 			if(armor >= damage) {
 				hp -= 1;
@@ -146,6 +102,7 @@ public class Warrior extends BaseCharacter{
 			if(hp <= 0) {
 				hp = 0;
 			}
+			damageSound.play();
 		}
 	}
 	
@@ -164,6 +121,7 @@ public class Warrior extends BaseCharacter{
 		attacking = false;
 		queued = false;
 		attack((int)(attack * 1.5));
+		strongAttackSound.play();
 	}
 	
 	public void stoneSkin() {
@@ -172,6 +130,7 @@ public class Warrior extends BaseCharacter{
 		queued = false;
 		stoneSkinCount = 900;
 		BaseLevel.dequeueTurn();
+		rejSound.play();
 	}
 }
 
