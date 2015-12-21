@@ -30,15 +30,17 @@ public class InfoDisplay {
 	Image purple = new ImageIcon("Sprites/PurpleInfoBar.png").getImage();
 	Image cyan = new ImageIcon("Sprites/CyanInfoBar.png").getImage();
 	Image health;
+	BaseLevel battle;
 	
-	public InfoDisplay(BaseCharacter c, int factor) {
+	public InfoDisplay(BaseCharacter c, int factor, BaseLevel battle) {
 		this.c = c;
 		this.factor = factor;
+		this.battle = battle;
 	}
 	
 	public void draw(Graphics g) {
 		
-		if(BaseLevel.getCharSelected() == factor) g.drawImage(statsSelected, 0, factor * (ht / 3), wd / 6, ht / 3, null);
+		if(battle.getCharSelected() == factor) g.drawImage(statsSelected, 0, factor * (ht / 3), wd / 6, ht / 3, null);
 		else g.drawImage(stats, 0, factor * (ht / 3), wd / 6, ht / 3, null);
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("pixelmix", Font.PLAIN, ht / 45));

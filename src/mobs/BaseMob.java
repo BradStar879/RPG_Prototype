@@ -14,6 +14,7 @@ public class BaseMob {
 	int barWd = gmWd / 36;
 	int barHt = gmHt / 18;
 	
+	public String name;
 	int lane;
 	int hp;
 	int maxHp;
@@ -34,12 +35,14 @@ public class BaseMob {
 	public int xp;
 	public String[] items;
 	public String[] rareItems;
+	BaseLevel battle;
 	
-	public BaseMob(int lane) {
+	public BaseMob(int lane, BaseLevel battle) {
 		this.lane = lane;
+		this.battle = battle;
 	}
 	
-	public BaseMob(int lane, int hp, int attack, int delay, int speed) {
+	public BaseMob(int lane, int hp, int attack, int delay, int speed, BaseLevel battle) {
 		this.lane = lane;
 		this.hp = hp;
 		this.maxHp = hp;
@@ -47,6 +50,7 @@ public class BaseMob {
 		this.delay = delay;
 		this.speed = speed;
 		this.delayCount = 0;
+		this.battle = battle;
 	}
 	
 	public void init() {
@@ -122,11 +126,31 @@ public class BaseMob {
 	
 	public void startAttack() {
 		attackPos = 3 * ((int)(Math.random() * 3)) + lane;
-		BaseLevel.startAttackChar(attackPos);
+		battle.startAttackChar(attackPos);
+	}
+	
+	public void startAttackLane() {
+		battle.startAttackLane(lane);
 	}
 	
 	public void attack() {
-		BaseLevel.attackChar(attackPos, attack);
+		battle.attackChar(attackPos, attack);
+	}
+	
+	public void attackLane() {
+		battle.attackChar(lane, attack);
+		if(!battle.checkPos(lane)) {
+			battle.attackChar(lane + 3, attack);
+			battle.attackChar(lane + 6, attack);
+		}
+		else if(!battle.getCharAt(lane).className.equals("Warrior")) {
+			battle.attackChar(lane + 3, attack);
+			battle.attackChar(lane + 6, attack);
+		}
+		else {
+			battle.attackChar(lane + 3);
+			battle.attackChar(lane + 6);
+		}
 	}
 	
 	public String getItem() {

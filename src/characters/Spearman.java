@@ -2,7 +2,6 @@
 
 import game.gamestate.BaseLevel;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -18,10 +17,10 @@ public class Spearman extends BaseCharacter{
 	Sounds strongAttackSound = new Sounds("Sounds/warrior hard sword slash.wav");
 	Sounds rejSound = new Sounds("Sounds/charging up.wav");
 
-	public Spearman(int num, int pos, Color col, String name, int level,
+	public Spearman(int num, int pos, BaseLevel battle, String name, int level,
 			int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor, 
 			int baseSpellAttack, Vector<Spells> spells) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack, spells);
+		super(num, pos, battle, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack, spells);
 	}
 	
 	public void init() {
@@ -53,24 +52,24 @@ public class Spearman extends BaseCharacter{
 		super.keyPressed(k);
 		if(attacking) {
 			if(k == KeyEvent.VK_RIGHT) {
-				if(BaseLevel.getMenuOption().equals("Attack")) {
+				if(battle.getMenuOption().equals("Attack")) {
 					attack(attack);
 					attackSound.play();
 				}
-				else if(BaseLevel.getMenuOption().equals("Energy Attack")) {
+				else if(battle.getMenuOption().equals("Energy Attack")) {
 					baseMenu = false;
 					spellMenu = true;
-					BaseLevel.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
+					battle.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
 						isSpellOnCooldown.elementAt(0), isSpellOnCooldown.elementAt(1), isSpellOnCooldown.elementAt(2), isSpellOnCooldown.elementAt(3));
 				}
-				else if(BaseLevel.getMenuOption().equals("Stretch") && !isMoveOnCooldown[2]) {
+				else if(battle.getMenuOption().equals("Stretch") && !isMoveOnCooldown[2]) {
 					stretch();
 				}
-				else if(BaseLevel.getMenuOption().equals("Throw Spear") && !isSpellOnCooldown.elementAt(0)) {
+				else if(battle.getMenuOption().equals("Throw Spear") && !isSpellOnCooldown.elementAt(0)) {
 					throwSpear();
 					spellMenu = false;
 				}
-				BaseLevel.changeMenuSelect("RIGHT");
+				battle.changeMenuSelect("RIGHT");
 				menuSelect = 0;
 				menuOption = 0;
 			}
@@ -84,7 +83,7 @@ public class Spearman extends BaseCharacter{
 		isMoveOnCooldown[2] = true;
 		attacking = false;
 		queued = false;
-		BaseLevel.dequeueTurn();
+		battle.dequeueTurn();
 		rejSound.play();
 	}
 	

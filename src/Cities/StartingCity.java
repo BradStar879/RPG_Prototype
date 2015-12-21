@@ -1,15 +1,17 @@
 package Cities;
 
+import game.gamestate.BaseWorld;
 import game.gamestate.GameStateManager;
 import game.gamestate.World;
 
-import java.awt.Color;
-import java.awt.Graphics;
-
+import npc.BaseNPC;
+import npc.FirstNPC;
 import physics.Sounds;
 import world.BaseWorldBlock;
 
-public class StartingCity extends World{
+public class StartingCity extends BaseWorld{
+	
+	FirstNPC npc;
 
 	public StartingCity(GameStateManager gsm) {
 		super(gsm);
@@ -24,35 +26,31 @@ public class StartingCity extends World{
 		worldLength = 50;
 		battleProb = 0;
 		world = new BaseWorldBlock[worldHeight][worldLength];
-		loadImageLevel(worldDrawn);
-		player.x = 20;
-		player.y = 20;
-		shiftX = player.x - 5;
-		shiftY = player.y - 3;
+		player.x = 23;
+		player.y = 44;
 		speed = blockSize / 14;
-		edgeX = 9;
-		edgeY = 5;
+		edgeX = 6;
+		edgeY = 3;
+		shiftX = player.x - edgeX;
+		shiftY = player.y - edgeY;
+		dir = 0;
+		loadImageLevel(worldDrawn);
+		npc = new FirstNPC(30, 30, edgeX, edgeY, blockSize, this, player.npcStages[0]);
+		npcs = new BaseNPC[]{npc};
 		bgm.stop();
 		bgm = new Sounds("Music/Castletheme.wav");
 		bgm.loop();
-		
-	}
-	
-	public void draw(Graphics g) {
-		
-		for(int i = player.y - 5; i < player.y + 5; i++) {
-			for(int j = player.x - 7; j < player.x + 9; j++) {
-				world[i][j].draw(g);
-			}
-		}
-		
-		g.setColor(Color.BLACK);
-		g.fillRect(blockSize * 5 + blockSize / 4,  blockSize * 3 + blockSize / 4, blockSize / 2, blockSize / 2);
-		
-		pDisplay.draw(g);
-	}
-	
-	
 
+		
+	}
 	
+	public void leaveCity() {
+		bgm.stop();
+		player.x = 21;
+		player.y = 25;
+		player.steps = 0;
+		loading = true;
+		gsm.states.pop();
+		gsm.states.push(new World(gsm));
+	}
 }

@@ -1,9 +1,8 @@
 package characters;
 
 import game.gamestate.BaseLevel;
-import game.gamestate.World;
+import game.gamestate.BaseWorld;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -20,9 +19,9 @@ public class Archer extends BaseCharacter{
 	int numFireArrows;
 	Sounds arrowSound = new Sounds("Sounds/arrow.wav");
 
-	public Archer(int num, int pos, Color col, String name, int level, int hp,
+	public Archer(int num, int pos, BaseLevel battle, String name, int level, int hp,
 			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack, Vector<Spells> spells) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack, spells);
+		super(num, pos, battle, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack, spells);
 		this.critAttack = (int)(attack * 2.2);
 	}
 	
@@ -50,7 +49,7 @@ public class Archer extends BaseCharacter{
 		}
 		else speed = baseSpeed;
 		
-		numFireArrows = World.inv.checkItem("Fire Arrow");
+		numFireArrows = BaseWorld.inv.checkItem("Fire Arrow");
 		if(numFireArrows == 0) isSpellOnCooldown.set(0, true);
 	}
 	
@@ -58,28 +57,28 @@ public class Archer extends BaseCharacter{
 		super.keyPressed(k);
 		if(attacking){
 			if(k == KeyEvent.VK_RIGHT) {
-				if(BaseLevel.getMenuOption().equals("Attack")) {
+				if(battle.getMenuOption().equals("Attack")) {
 					time = 0;
 					arrowSound.play();
 					if(Math.random() * 100 < critChance) attack(critAttack);
 					else attack(attack);
 				}
-				else if(BaseLevel.getMenuOption().equals("Spec. Arrow")) {
-					BaseLevel.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
+				else if(battle.getMenuOption().equals("Spec. Arrow")) {
+					battle.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
 							isSpellOnCooldown.elementAt(0), isSpellOnCooldown.elementAt(1), isSpellOnCooldown.elementAt(2), isSpellOnCooldown.elementAt(3));
 					baseMenu = false;
 					spellMenu = true;
 				}
-				else if(BaseLevel.getMenuOption().equals("Speed Up") && !isMoveOnCooldown[2]) {
+				else if(battle.getMenuOption().equals("Speed Up") && !isMoveOnCooldown[2]) {
 					time = 0;
 					speedUp();
 				}
-				else if(BaseLevel.getMenuOption().equals("Fire Arrow") && !isSpellOnCooldown.elementAt(0)) {
+				else if(battle.getMenuOption().equals("Fire Arrow") && !isSpellOnCooldown.elementAt(0)) {
 					time = 0;
 					spellMenu = false;
 					fireArrow();
 				}
-				BaseLevel.changeMenuSelect("RIGHT");
+				battle.changeMenuSelect("RIGHT");
 				menuSelect = 0;
 				menuOption = 0;
 			}
@@ -92,14 +91,14 @@ public class Archer extends BaseCharacter{
 		isMoveOnCooldown[2] = true;
 		attacking = false;
 		queued = false;
-		BaseLevel.dequeueTurn();
+		battle.dequeueTurn();
 	}
 	
 	public void fireArrow() {
 		attacking = false;
 		queued = false;
 		attack((int)(attack * 1.5));
-		World.inv.removeItem("Fire Arrow");
+		BaseWorld.inv.removeItem("Fire Arrow");
 		arrowSound.play();
 	}
 	
@@ -107,7 +106,7 @@ public class Archer extends BaseCharacter{
 		attacking = false;
 		queued = false;
 		attack(attack);
-		World.inv.removeItem("Poison Arrow");
+		BaseWorld.inv.removeItem("Poison Arrow");
 		arrowSound.play();
 	}
 }

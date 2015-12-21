@@ -43,6 +43,18 @@ public class ClassSelection extends GameState{
 	Image background = new ImageIcon("Sprites/CharacterSelectionScreen.png").getImage();
 	Image arrow = loader.loadImage("/SideArrow.png").getScaledInstance(wd / 20, wd / 40, Image.SCALE_SMOOTH);
 	Image rDisplay = new ImageIcon("Sprites/PauseBox.png").getImage();
+	Image warriorPortrait = loader.loadImage("/Warrior_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
+	Image blackmagePortrait = loader.loadImage("/Blackmage_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
+	Image whitemagePortrait = loader.loadImage("/Whitemage_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
+	Image archerPortrait = loader.loadImage("/Archer_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
+	Image spearmanPortrait = loader.loadImage("/Spearman_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
+	Image monkPortrait = loader.loadImage("/Monk_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
+	Image warriorPortraitBig = loader.loadImage("/Warrior_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
+	Image blackmagePortraitBig = loader.loadImage("/Blackmage_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
+	Image whitemagePortraitBig = loader.loadImage("/Whitemage_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
+	Image archerPortraitBig = loader.loadImage("/Archer_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
+	Image spearmanPortraitBig = loader.loadImage("/Spearman_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
+	Image monkPortraitBig = loader.loadImage("/Monk_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
 	Sounds menuSelectSound = new Sounds("Sounds/menu select.wav");
 	Sounds menuBackSound = new Sounds("Sounds/menu back.wav");
 
@@ -102,10 +114,24 @@ public class ClassSelection extends GameState{
 		}
 
 		g.drawImage(arrow, (classSelect % 3) * boxWd + 4 * border, (classSelect / 3) * (ht / 2) + border * 5, null);
+		g.drawImage(warriorPortrait, 16 * border, border * 2, null);
+		g.drawImage(blackmagePortrait, boxWd + 16 * border, border * 2, null);
+		g.drawImage(whitemagePortrait, boxWd * 2 + 16 * border, border * 2, null);
+		g.drawImage(archerPortrait, 16 * border, ht / 2 + border * 2, null);
+		g.drawImage(spearmanPortrait, boxWd + 16 * border, ht / 2 + border * 2, null);
+		g.drawImage(monkPortrait, boxWd * 2 + 16 * border, ht / 2 + border * 2, null);
 		
 		for(int i = 0; i < 3; i++) {
 			g.drawString(names[i], wd - wd / 4 + 3 * border, ht / 4 + (i * ht / 3));
-			if(classesSelected[i] != "") g.drawString("Class: " + classesSelected[i], wd - wd / 4 + 3 * border, ht / 3 + (i * ht / 3) - 3 * border);
+			if(classesSelected[i] != "") {
+				g.drawString("Class: " + classesSelected[i], wd - wd / 4 + 3 * border, ((i+1) * ht / 3) - 3 * border);
+				if(classesSelected[i].equals("Warrior")) g.drawImage(warriorPortraitBig, boxWd * 3 + border * 17 / 2, (i * ht / 3) + border * 2, null);
+				else if(classesSelected[i].equals("Black Mage")) g.drawImage(blackmagePortraitBig, boxWd * 3 + border * 17 / 2, (i * ht / 3) + border * 2, null);
+				else if(classesSelected[i].equals("White Mage")) g.drawImage(whitemagePortraitBig, boxWd * 3 + border * 17 / 2, (i * ht / 3) + border * 2, null);
+				else if(classesSelected[i].equals("Archer")) g.drawImage(archerPortraitBig, boxWd * 3 + border * 17 / 2, (i * ht / 3) + border * 2, null);
+				else if(classesSelected[i].equals("Spearman")) g.drawImage(spearmanPortraitBig, boxWd * 3 + border * 17 / 2, (i * ht / 3) + border * 2, null);
+				else g.drawImage(monkPortraitBig, boxWd * 3 + border * 17 / 2, (i * ht / 3) + border * 2, null);
+			}
 		}
 		
 		if(readyMenu) {
@@ -158,9 +184,10 @@ public class ClassSelection extends GameState{
 					char2 = new CharacterStats(names[1], classesSelected[1]);
 					char3 = new CharacterStats(names[2], classesSelected[2]);
 					team = new CharacterStats[]{char1, char2, char3};
-					World.team = this.team;
+					World world = new World(gsm);
+					world.team = this.team;
 					gsm.states.pop();
-					gsm.states.push(new World(gsm));
+					gsm.states.push(world);
 				}
 				else {
 					menuSelectSound.play();

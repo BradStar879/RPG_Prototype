@@ -1,9 +1,8 @@
 package player;
 
+import game.gamestate.BaseWorld;
 import game.gamestate.MenuState;
-import game.gamestate.World;
 
-import java.awt.Color;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Vector;
 
 
 public class Saver implements Serializable{
@@ -19,19 +19,21 @@ public class Saver implements Serializable{
 
 	private static final long serialVersionUID = 1246801783532L;
 	CharacterStats[] team = new CharacterStats[3];
-	PlayerMover position = new PlayerMover(Color.BLACK, 1, 1, 0);
+	PlayerMover position = new PlayerMover(1, 1, 0);
 	Inventory inv = new Inventory();
+	Vector<Quests> quests = new Vector<Quests>();
 	
 	public Saver() {
 		
 	}
 	
-	public void save(CharacterStats[] chars, PlayerMover player, Inventory inv) {
+	public void save(CharacterStats[] chars, PlayerMover player, Inventory inv, Vector<Quests> quests) {
 		ObjectOutputStream outputStream;
 		ObjectOutputStream outputStream2;
 		ObjectOutputStream outputStream3;
 		ObjectOutputStream outputStream4;
 		ObjectOutputStream outputStream5;
+		ObjectOutputStream outputStream6;
 		try {
 			outputStream = new ObjectOutputStream(new FileOutputStream("Save/Char1.dat"));
 			outputStream.writeObject(chars[0]);
@@ -43,6 +45,8 @@ public class Saver implements Serializable{
 			outputStream4.writeObject(player);
 			outputStream5 = new ObjectOutputStream(new FileOutputStream("Save/Inv.dat"));
 			outputStream5.writeObject(inv);
+			outputStream6 = new ObjectOutputStream(new FileOutputStream("Save/Quest.dat"));
+			outputStream6.writeObject(quests);
 			System.out.println("SAVED");
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -67,10 +71,13 @@ public class Saver implements Serializable{
 				position = (PlayerMover) inputStream4.readObject();
 				ObjectInputStream inputStream5 = new ObjectInputStream(new BufferedInputStream(new FileInputStream("Save/Inv.dat")));
 				inv = (Inventory) inputStream5.readObject();
-				World.loading = true;
-				World.player = position;
-				World.team = team;
-				World.inv = inv;
+				ObjectInputStream inputStream6 = new ObjectInputStream(new BufferedInputStream(new FileInputStream("Save/Quest.dat")));
+				quests = (Vector<Quests>) inputStream6.readObject();
+				BaseWorld.loading = true;
+				BaseWorld.player = position;
+				BaseWorld.team = team;
+				BaseWorld.inv = inv;
+				BaseWorld.quests = quests;
 				MenuState.isSavedGame = true;
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block

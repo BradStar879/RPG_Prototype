@@ -16,7 +16,6 @@ public class BaseCharacter {
 	
 	int num;
 	int pos; 
-	Color col;
 	int x;
 	int y;
 	boolean selected;
@@ -64,7 +63,7 @@ public class BaseCharacter {
 	int[] moveMpCost;
 	boolean baseMenu;
 	
-	Vector<Spells> spells;
+	Vector<Spells> spells = new Vector<Spells>();
 	Vector<String> spellSet;
 	Vector<Boolean> isSpellOnCooldown;
 	Vector<Integer> spellCooldown;
@@ -77,20 +76,15 @@ public class BaseCharacter {
 	int regenAmount;
 	
 	public String mpName;
+	BaseLevel battle;
 	
 	Sounds damageSound = new Sounds("Sounds/playerattacked.wav");
 	
-	public BaseCharacter(int num, int pos, Color col) {
-		this.num = num;
-		this.pos = pos;
-		this.col = col;
-	}
-	
-	public BaseCharacter(int num, int pos, Color col, String name, int level, int hp, int maxHp, int mp,
+	public BaseCharacter(int num, int pos, BaseLevel battle, String name, int level, int hp, int maxHp, int mp,
 			int maxMp, int speed, int attack, int armor, int spellPower, Vector<Spells> spells) {
 		this.num = num;
 		this.pos = pos;
-		this.col = col;
+		this.battle = battle;
 		this.name = name;
 		this.level = level;
 		this.hp = hp;
@@ -102,7 +96,8 @@ public class BaseCharacter {
 		this.attack = attack;
 		this.armor = armor;
 		this.spellPower = spellPower;
-		this.spells = spells;
+		this.spells.setSize(spells.size());
+		for(int i = 0; i < spells.size(); i++) this.spells.set(i, spells.get(i));
 	}
 	
 	public void init() {
@@ -149,7 +144,7 @@ public class BaseCharacter {
 			numSpells++;
 		}
 		while(spellSet.size() < 4) {
-			spells.add(new Spells(""));
+			spells.add(new Spells("bla"));
 			spellSet.add("");
 			spellCooldown.add(0);
 			isSpellOnCooldown.add(false);
@@ -166,7 +161,7 @@ public class BaseCharacter {
 		else alive = true;
 		
 		if(alive) {
-			if(num == BaseLevel.getCharSelected()) {
+			if(num == battle.getCharSelected()) {
 				selected = true;
 			}
 			else {
@@ -177,15 +172,15 @@ public class BaseCharacter {
 			if(time >= timeMax && !queued) {
 				time = timeMax;
 				queued = true;
-				BaseLevel.enqueueTurn(this);
+				battle.enqueueTurn(this);
 			}
 			lane = pos % 3;
 			distance = pos / 3;
 		}
 		else {
-			if(num == BaseLevel.getCharSelected()) {
+			if(num == battle.getCharSelected()) {
 				selected = false;
-				BaseLevel.charSelectForward();
+				battle.charSelectForward();
 			}
 		}
 		
@@ -220,17 +215,16 @@ public class BaseCharacter {
 			else if(mp < spells.elementAt(i+1).mpCost) isSpellOnCooldown.set(i, true);
 			else isSpellOnCooldown.set(i, false);
 		}
-		if(attacking && baseMenu) BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
+		if(attacking && baseMenu) battle.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
 				isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
 		else if(attacking && spellMenu)
-			BaseLevel.changeMenuOptions(spellSet.elementAt(menuOption-menuSelect), spellSet.elementAt(menuOption-menuSelect+1), spellSet.elementAt(menuOption-menuSelect+2), spellSet.elementAt(menuOption-menuSelect+3), 
+			battle.changeMenuOptions(spellSet.elementAt(menuOption-menuSelect), spellSet.elementAt(menuOption-menuSelect+1), spellSet.elementAt(menuOption-menuSelect+2), spellSet.elementAt(menuOption-menuSelect+3), 
 					isSpellOnCooldown.elementAt(menuOption-menuSelect), isSpellOnCooldown.elementAt(menuOption-menuSelect+1), isSpellOnCooldown.elementAt(menuOption-menuSelect+2), isSpellOnCooldown.elementAt(menuOption-menuSelect+3));
 	}
 	
 	
 	public void draw(Graphics g) {
 	
-		g.setColor(col);
 		if(pos == 0) {
 			x = gmHt * 23 / 36;
 			y = rowCoord0;
@@ -310,27 +304,27 @@ public class BaseCharacter {
 
 	public void keyPressed(int k) {
 		if(selected) {
-			if(k == KeyEvent.VK_W && pos > 2 && !BaseLevel.checkPos(pos - 3)) {
+			if(k == KeyEvent.VK_W && pos > 2 && !battle.checkPos(pos - 3)) {
 				pos -= 3;
-				BaseLevel.changePos(pos + 3, false);
-				BaseLevel.changePos(pos, true);
+				battle.changePos(pos + 3, false);
+				battle.changePos(pos, true);
 			}
-			if(k == KeyEvent.VK_S && pos < 6 && !BaseLevel.checkPos(pos + 3)) {
+			if(k == KeyEvent.VK_S && pos < 6 && !battle.checkPos(pos + 3)) {
 				pos += 3;
-				BaseLevel.changePos(pos - 3, false);
-				BaseLevel.changePos(pos, true);
+				battle.changePos(pos - 3, false);
+				battle.changePos(pos, true);
 			}
 			if(k == KeyEvent.VK_A && pos != 0  && pos != 3 && pos != 6)
-				if (!BaseLevel.checkPos(pos - 1)) {
+				if (!battle.checkPos(pos - 1)) {
 					pos -= 1;
-					BaseLevel.changePos(pos + 1, false);
-					BaseLevel.changePos(pos, true);
+					battle.changePos(pos + 1, false);
+					battle.changePos(pos, true);
 				}
 			if(k == KeyEvent.VK_D && pos != 2  && pos != 5 && pos != 8)
-				if (!BaseLevel.checkPos(pos + 1)) {
+				if (!battle.checkPos(pos + 1)) {
 					pos += 1;
-					BaseLevel.changePos(pos - 1, false);
-					BaseLevel.changePos(pos, true);
+					battle.changePos(pos - 1, false);
+					battle.changePos(pos, true);
 				}
 			
 			}
@@ -339,11 +333,11 @@ public class BaseCharacter {
 			if(k == KeyEvent.VK_UP) {
 				if(spellMenu && menuOption != 0 && menuSelect == 0) {
 					menuOption--;
-					BaseLevel.changeMenuOptions(spellSet.elementAt(menuOption), spellSet.elementAt(menuOption+1), spellSet.elementAt(menuOption+2), spellSet.elementAt(menuOption+3), 
+					battle.changeMenuOptions(spellSet.elementAt(menuOption), spellSet.elementAt(menuOption+1), spellSet.elementAt(menuOption+2), spellSet.elementAt(menuOption+3), 
 							isSpellOnCooldown.elementAt(menuOption), isSpellOnCooldown.elementAt(menuOption+1), isSpellOnCooldown.elementAt(menuOption+2), isSpellOnCooldown.elementAt(menuOption+3));
 				}
 				else if(menuSelect != 0) {
-					BaseLevel.changeMenuSelect("UP");
+					battle.changeMenuSelect("UP");
 					menuSelect--;
 					menuOption--;
 				}
@@ -351,11 +345,11 @@ public class BaseCharacter {
 			if(k == KeyEvent.VK_DOWN) {
 				if(spellMenu && menuOption != numSpells - 1 && menuSelect == 3) {
 					menuOption++;
-					BaseLevel.changeMenuOptions(spellSet.elementAt(menuOption-3), spellSet.elementAt(menuOption-2), spellSet.elementAt(menuOption-1), spellSet.elementAt(menuOption), 
+					battle.changeMenuOptions(spellSet.elementAt(menuOption-3), spellSet.elementAt(menuOption-2), spellSet.elementAt(menuOption-1), spellSet.elementAt(menuOption), 
 							isSpellOnCooldown.elementAt(menuOption-3), isSpellOnCooldown.elementAt(menuOption-2), isSpellOnCooldown.elementAt(menuOption-1), isSpellOnCooldown.elementAt(menuOption));
 				}
 				else if(menuSelect != 3 && !(spellMenu && menuOption == numSpells - 1)) {
-					BaseLevel.changeMenuSelect("DOWN");
+					battle.changeMenuSelect("DOWN");
 					menuSelect++;
 					menuOption++;
 				}
@@ -363,17 +357,17 @@ public class BaseCharacter {
 			if(k == KeyEvent.VK_LEFT) {
 				if(baseMenu) {
 					attacking = false;
-					BaseLevel.dequeueTurn();
-					BaseLevel.enqueueTurn(this);
+					battle.dequeueTurn();
+					battle.enqueueTurn(this);
 				}
 				else {
 					spellMenu = false;
 					invMenu = false;
 					baseMenu = true;
-					BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
+					battle.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
 							isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
 				}
-				BaseLevel.changeMenuSelect("LEFT");
+				battle.changeMenuSelect("LEFT");
 				menuSelect = 0;
 				menuOption = 0;
 			}
@@ -434,41 +428,37 @@ public class BaseCharacter {
 	
 	public void attackMode() {
 		if(!attacking) {
-			BaseLevel.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
+			battle.changeMenuOptions(moveSet[0], moveSet[1], moveSet[2], moveSet[3], 
 				isMoveOnCooldown[0], isMoveOnCooldown[1], isMoveOnCooldown[2], isMoveOnCooldown[3]);
 			baseMenu = true;
 		}
 		attacking = true;
 	}
 	
-	public Color getColor() {
-		return col;
-	}
-	
 	public void attack(int damage) {
 		time = 0;
 		attacking = false;
 		queued = false;
-		BaseLevel.dequeueTurn();
+		battle.dequeueTurn();
 		if(range == 1) {
 			if(distance == 0) {
-				BaseLevel.attackMob(lane, damage);
+				battle.attackMob(lane, damage);
 			}
 			else {
-				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
+				if(battle.checkPos(pos - 3)) battle.attackChar(pos - 3, damage);
 			}
 		}
 		else {
 			if(distance == 2) {
-				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
-				else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, damage);
-				else if(distance < range) BaseLevel.attackMob(lane, damage);
+				if(battle.checkPos(pos - 3)) battle.attackChar(pos - 3, damage);
+				else if(battle.checkPos(pos - 6)) battle.attackChar(pos - 6, damage);
+				else if(distance < range) battle.attackMob(lane, damage);
 			}
 			else if(distance == 1) {
-				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
-				else if(distance < range) BaseLevel.attackMob(lane, damage);
+				if(battle.checkPos(pos - 3)) battle.attackChar(pos - 3, damage);
+				else if(distance < range) battle.attackMob(lane, damage);
 			}
-			else if(distance < range) BaseLevel.attackMob(lane, damage);
+			else if(distance < range) battle.attackMob(lane, damage);
 		}
 	}
 	
@@ -567,9 +557,9 @@ public class BaseCharacter {
 	
 	public int getCurrentCooldown() {
 		for(int i = 0; i < moveSet.length; i++)
-			if(BaseLevel.getMenuOption().equals(moveSet[i])) return (moveCooldown[i] + 59) / 60;
+			if(battle.getMenuOption().equals(moveSet[i])) return (moveCooldown[i] + 59) / 60;
 		for(int i = 0; i < spellSet.size(); i++)
-			if(BaseLevel.getMenuOption().equals(spellSet.elementAt(i))) return (spellCooldown.elementAt(i) + 59) / 60;
+			if(battle.getMenuOption().equals(spellSet.elementAt(i))) return (spellCooldown.elementAt(i) + 59) / 60;
 		return 0;
 	}
 	

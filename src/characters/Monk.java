@@ -2,7 +2,6 @@ package characters;
 
 import game.gamestate.BaseLevel;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -19,9 +18,9 @@ public class Monk extends BaseCharacter{
 	Sounds strongAttackSound = new Sounds("Sounds/hard punch.wav");
 	Sounds rejSound = new Sounds("Sounds/charging up.wav");
 
-	public Monk(int num, int pos, Color col, String name, int level, int hp,
+	public Monk(int num, int pos, BaseLevel battle, String name, int level, int hp,
 			int maxHp, int mp, int maxMp, int speed, int attack, int armor, int baseSpellAttack, Vector<Spells> spells) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack, spells);
+		super(num, pos, battle, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, baseSpellAttack, spells);
 	}
 	
 	public void init() {
@@ -54,28 +53,28 @@ public class Monk extends BaseCharacter{
 		super.keyPressed(k);
 		if(attacking) {;
 			if(k == KeyEvent.VK_RIGHT) {
-				if(BaseLevel.getMenuOption().equals("Attack")) {
+				if(battle.getMenuOption().equals("Attack")) {
 					attack(attack);
 					attackSound.play();
 				}
-				else if(BaseLevel.getMenuOption().equals("Charm Spell")) {
+				else if(battle.getMenuOption().equals("Charm Spell")) {
 					baseMenu = false;
 					spellMenu = true;
-					BaseLevel.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
+					battle.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
 						isSpellOnCooldown.elementAt(0), isSpellOnCooldown.elementAt(1), isSpellOnCooldown.elementAt(2), isSpellOnCooldown.elementAt(3));
 				}
-				else if(BaseLevel.getMenuOption().equals("Meditate") && !isMoveOnCooldown[2]) {
+				else if(battle.getMenuOption().equals("Meditate") && !isMoveOnCooldown[2]) {
 					meditate();
 				}
-				else if(BaseLevel.getMenuOption().equals("Power Punch") && !isSpellOnCooldown.elementAt(0)) {
+				else if(battle.getMenuOption().equals("Power Punch") && !isSpellOnCooldown.elementAt(0)) {
 					powerPunch();
 					spellMenu = false;
 				}
-				else if(BaseLevel.getMenuOption().equals("Cleanse") && !isSpellOnCooldown.elementAt(1)) {
+				else if(battle.getMenuOption().equals("Cleanse") && !isSpellOnCooldown.elementAt(1)) {
 					cleanse();
 					spellMenu = false;
 				}
-				BaseLevel.changeMenuSelect("RIGHT");
+				battle.changeMenuSelect("RIGHT");
 				menuSelect = 0;
 				menuOption = 0;
 			}
@@ -86,29 +85,29 @@ public class Monk extends BaseCharacter{
 		time = 0;
 		attacking = false;
 		queued = false;
-		BaseLevel.dequeueTurn();
+		battle.dequeueTurn();
 		if(range == 1) {
 			if(distance == 0) {
-				if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
+				if(battle.attackMob(lane, damage) && mp != maxMp) mp++;
 			}
 			else {
-				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
+				if(battle.checkPos(pos - 3)) battle.attackChar(pos - 3, damage);
 			}
 		}
 		else {
 			if(distance == 2) {
-				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
-				else if(BaseLevel.checkPos(pos - 6)) BaseLevel.attackChar(pos - 6, damage);
+				if(battle.checkPos(pos - 3)) battle.attackChar(pos - 3, damage);
+				else if(battle.checkPos(pos - 6)) battle.attackChar(pos - 6, damage);
 				else if(distance < range) 
-					if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
+					if(battle.attackMob(lane, damage) && mp != maxMp) mp++;
 			}
 			else if(distance == 1) {
-				if(BaseLevel.checkPos(pos - 3)) BaseLevel.attackChar(pos - 3, damage);
+				if(battle.checkPos(pos - 3)) battle.attackChar(pos - 3, damage);
 				else if(distance < range)
-					if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
+					if(battle.attackMob(lane, damage) && mp != maxMp) mp++;
 			}
 			else if(distance < range) 
-				if(BaseLevel.attackMob(lane, damage) && mp != maxMp) mp++;
+				if(battle.attackMob(lane, damage) && mp != maxMp) mp++;
 		}
 	}
 	
@@ -118,7 +117,7 @@ public class Monk extends BaseCharacter{
 		isMoveOnCooldown[2] = true;
 		attacking = false;
 		queued = false;
-		BaseLevel.dequeueTurn();
+		battle.dequeueTurn();
 		rejSound.play();
 	}
 	
@@ -137,7 +136,7 @@ public class Monk extends BaseCharacter{
 		queued = false;
 		mp--;
 		heal(maxHp / 4);
-		BaseLevel.dequeueTurn();
+		battle.dequeueTurn();
 		rejSound.play();
 	}
 

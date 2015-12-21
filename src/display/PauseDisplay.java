@@ -30,9 +30,11 @@ public class PauseDisplay {
 	boolean paused = false;
 	String[] pauseOptions = new String[]{"Resume", "Options", "Quit"};
 	int pauseSelect = 0;
+	BaseLevel battle;
 	
-	
-	public PauseDisplay() {}
+	public PauseDisplay(BaseLevel battle) {
+		this.battle = battle;
+	}
 	
 	public void draw(Graphics g) {
 		
@@ -61,13 +63,12 @@ public class PauseDisplay {
 			if(k == KeyEvent.VK_ENTER) {
 				if(pauseSelect == 0) {
 					unpause();
-					BaseLevel.unpause();
 					menuSelectSound.play();
 				}
 				else if(pauseSelect == 1) ;
 				else if(pauseSelect == 2) {
 					menuBackSound.play();
-					BaseLevel.exit();
+					battle.exit();
 				}
 			}
 		}
@@ -80,6 +81,7 @@ public class PauseDisplay {
 	
 	public void unpause() {
 		paused = false;
+		battle.unpause();
 	}
 	
 

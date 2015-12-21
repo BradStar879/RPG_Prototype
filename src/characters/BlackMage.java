@@ -2,7 +2,6 @@ package characters;
 
 import game.gamestate.BaseLevel;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -19,10 +18,10 @@ public class BlackMage extends BaseCharacter{
 	Sounds lightningSound = new Sounds("Sounds/black mage lightning.wav");
 	Sounds rejSound = new Sounds("Sounds/charging up.wav");
 
-	public BlackMage(int num, int pos, Color col, String name, int level,
+	public BlackMage(int num, int pos, BaseLevel battle, String name, int level,
 			int hp, int maxHp, int mp, int maxMp, int speed, int attack, int armor,
 			int spellPower, Vector<Spells> spells) {
-		super(num, pos, col, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, spellPower, spells);
+		super(num, pos, battle, name, level, hp, maxHp, mp, maxMp, speed, attack, armor, spellPower, spells);
 	}
 	
 	public void init() {
@@ -50,32 +49,32 @@ public class BlackMage extends BaseCharacter{
 		super.keyPressed(k);
 		if(attacking){
 			if(k == KeyEvent.VK_RIGHT) {
-				if(BaseLevel.getMenuOption().equals("Attack")) {
+				if(battle.getMenuOption().equals("Attack")) {
 					attack(attack);
 					attackSound.play();
 				}
-				else if(BaseLevel.getMenuOption().equals("Black Magic")) {
+				else if(battle.getMenuOption().equals("Black Magic")) {
 					baseMenu = false;
 					spellMenu = true;
-					BaseLevel.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
+					battle.changeMenuOptions(spellSet.elementAt(0), spellSet.elementAt(1), spellSet.elementAt(2), spellSet.elementAt(3), 
 						isSpellOnCooldown.elementAt(0), isSpellOnCooldown.elementAt(1), isSpellOnCooldown.elementAt(2), isSpellOnCooldown.elementAt(3));
 				}
-				else if(BaseLevel.getMenuOption().equals("Rejuvinate")) {
+				else if(battle.getMenuOption().equals("Rejuvinate")) {
 					rejuvinate();
 				}
-				else if(BaseLevel.getMenuOption().equals("Fire") && !isSpellOnCooldown.elementAt(0)) {
+				else if(battle.getMenuOption().equals("Fire") && !isSpellOnCooldown.elementAt(0)) {
 					fire();
 					spellMenu = false;
 				}
-				else if(BaseLevel.getMenuOption().equals("Ice") && !isSpellOnCooldown.elementAt(1)) {
+				else if(battle.getMenuOption().equals("Ice") && !isSpellOnCooldown.elementAt(1)) {
 					ice();
 					spellMenu = false;
 				}
-				else if(BaseLevel.getMenuOption().equals("Lightning") && !isSpellOnCooldown.elementAt(2)) {
+				else if(battle.getMenuOption().equals("Lightning") && !isSpellOnCooldown.elementAt(2)) {
 					lightning();
 					spellMenu = false;
 				}
-				BaseLevel.changeMenuSelect("RIGHT");
+				battle.changeMenuSelect("RIGHT");
 				menuSelect = 0;
 				menuOption = 0;
 			}
@@ -88,7 +87,7 @@ public class BlackMage extends BaseCharacter{
 		queued = false;
 		mp += 10;
 		if(mp > maxMp) mp = maxMp;
-		BaseLevel.dequeueTurn();
+		battle.dequeueTurn();
 		rejSound.play();
 	}
 	

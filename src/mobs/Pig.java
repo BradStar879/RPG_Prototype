@@ -8,12 +8,9 @@ import javax.swing.ImageIcon;
 
 public class Pig extends BaseMob{
 
-	public Pig(int lane, int hp, int attack, int delay, int speed) {
-		super(lane, hp, attack, delay, speed);
-	}
-	
-	public Pig(int lane) {
-		super(lane);
+	public Pig(int lane, BaseLevel battle) {
+		super(lane, battle);
+		name = "Pig";
 		maxHp = 100;
 		hp = maxHp;
 		attack = 25;
@@ -27,23 +24,11 @@ public class Pig extends BaseMob{
 	}
 	
 	public void startAttack() {
-		BaseLevel.startAttackLane(lane);
+		super.startAttackLane();
 	}
 	
 	public void attack() {
-		BaseLevel.attackChar(lane, attack);
-		if(!BaseLevel.checkPos(lane)) {
-			BaseLevel.attackChar(lane + 3, attack);
-			BaseLevel.attackChar(lane + 6, attack);
-		}
-		else if(!BaseLevel.getCharAt(lane).className.equals("Warrior")) {
-			BaseLevel.attackChar(lane + 3, attack);
-			BaseLevel.attackChar(lane + 6, attack);
-		}
-		else {
-			BaseLevel.attackChar(lane + 3);
-			BaseLevel.attackChar(lane + 6);
-		}
+		super.attackLane();
 	}
 
 }

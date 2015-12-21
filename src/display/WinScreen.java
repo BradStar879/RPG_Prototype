@@ -1,6 +1,6 @@
 package display;
 
-import game.gamestate.World;
+import game.gamestate.BaseWorld;
 import game.main.GamePanel;
 
 import java.awt.Color;
@@ -17,6 +17,7 @@ public class WinScreen{
 	int wd = GamePanel.WIDTH;
 	int ht = GamePanel.HEIGHT;
 	int border = ht / 62;
+	BufferedImageLoader loader = new BufferedImageLoader();
 	Image winBackground = new ImageIcon("Sprites/WorldPauseBox.png").getImage();
 	Image green = new ImageIcon("Sprites/GreenInfoBar.png").getImage();
 	Image yellow = new ImageIcon("Sprites/YellowInfoBar.png").getImage();
@@ -24,6 +25,12 @@ public class WinScreen{
 	Image red = new ImageIcon("Sprites/RedInfoBar.png").getImage();
 	Image purple = new ImageIcon("Sprites/PurpleInfoBar.png").getImage();
 	Image black = new ImageIcon("Sprites/BlackBar.png").getImage();
+	Image warriorPortrait = loader.loadImage("/Warrior_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
+	Image blackmagePortrait = loader.loadImage("/Blackmage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
+	Image whitemagePortrait = loader.loadImage("/Whitemage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
+	Image archerPortrait = loader.loadImage("/Archer_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
+	Image spearmanPortrait = loader.loadImage("/Spearman_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
+	Image monkPortrait = loader.loadImage("/Monk_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
 	Image health;
 	public boolean won = false;
 	int screenHeight = -ht;
@@ -61,7 +68,7 @@ public class WinScreen{
 		
 		screenTick++;
 		if(screenTick >= 60) screenTick = 0;
-		team = World.team;
+		team = BaseWorld.team;
 		
 	}
 
@@ -120,6 +127,14 @@ public class WinScreen{
 				g.setColor(Color.YELLOW);
 				g.drawString("LEVEL UP!", wd / 2 + 7 * border, ht / 5 + (i * ht / 3) - border * 3 + screenHeight);
 			}
+			Image port;
+			if(team[i].className.equals("Warrior")) port = warriorPortrait;
+			else if(team[i].className.equals("Black Mage")) port = blackmagePortrait;
+			else if(team[i].className.equals("White Mage")) port = whitemagePortrait;
+			else if(team[i].className.equals("Archer")) port = archerPortrait;
+			else if(team[i].className.equals("Spearman")) port = spearmanPortrait;
+			else port = monkPortrait;
+			g.drawImage(port, border * 3, i * ht / 3 + ht / 15 + screenHeight, null);
 		}
 		
 	}

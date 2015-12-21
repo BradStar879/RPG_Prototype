@@ -10,7 +10,9 @@ public class BaseWorldBlock {
 	public int wd;
 	int ht = GamePanel.HEIGHT / 12;
 	public boolean walkable;
-	public boolean enter;
+	public boolean hasPerson = false;
+	public boolean enter = false;
+	public boolean exit = false;
 	public int x;
 	public int y;
 	Image blockType;
@@ -24,6 +26,6 @@ public class BaseWorldBlock {
 	}
 	
 	public void draw(Graphics g) {
-		g.fillRect(x, y, wd, ht);
+		g.drawImage(blockType, x, y, wd, wd, null);
 	}
 }

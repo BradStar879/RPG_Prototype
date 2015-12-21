@@ -24,8 +24,11 @@ public class QueueDisplay {
 	Image queueBox = new ImageIcon("Sprites/QueueBox.png").getImage();
 	Image shortQueueBox = new ImageIcon("Sprites/ShortQueueDisplay.png").getImage();
 	Spells spell;
+	BaseLevel battle;
 	
-	public QueueDisplay() {}
+	public QueueDisplay(BaseLevel battle) {
+		this.battle = battle;
+	}
 	
 	public void tick() {
 		
@@ -41,7 +44,7 @@ public class QueueDisplay {
 			if(disQueue[j] != null) {
 				if(j == 0 && disQueue[j] != null) {
 					g.drawImage(queueBox, wd - queueWd, ht - queueHt * 2 - (j * (ht / 10)), queueWd, queueHt, null);
-					spell = new Spells(BaseLevel.getMenuOption());
+					spell = new Spells(battle.getMenuOption());
 					g.drawString(spell.name,  wd - queueWd + border * 2,  ht - (queueHt * 2) + border * 6);
 					if(spell.mpCost != -1) {
 						g.drawString(disQueue[j].mpName + ": " + spell.mpCost,  wd - queueWd + border * 2,  ht - queueHt * 2 + border * 8);

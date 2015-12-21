@@ -1,13 +1,16 @@
 package mobs;
 
+import game.gamestate.BaseLevel;
+
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
 
 public class Bunny extends BaseMob{
 
-	public Bunny(int lane) {
-		super(lane);
+	public Bunny(int lane, BaseLevel battle) {
+		super(lane, battle);
+		name = "Bunny";
 		maxHp = 75;
 		hp = maxHp;
 		attack = 25;

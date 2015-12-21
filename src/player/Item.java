@@ -2,7 +2,7 @@ package player;
 
 import java.util.Arrays;
 
-import game.gamestate.World;
+import game.gamestate.BaseWorld;
 
 public class Item {
 	
@@ -18,7 +18,7 @@ public class Item {
 			else {
 				team.hp += 50;
 				if(team.hp > team.maxHp) team.hp = team.maxHp;
-				World.inv.removeItem(item);
+				BaseWorld.inv.removeItem(item);
 			}
 		}
 		else if(item.equals("MP Potion")) {
@@ -26,18 +26,18 @@ public class Item {
 			else {
 				team.mp += 50;
 				if(team.mp > team.maxMp) team.mp = team.maxMp;
-				World.inv.removeItem(item);
+				BaseWorld.inv.removeItem(item);
 			}
 		}
 		else if(Arrays.asList(weapons).indexOf(item) != -1 && team.className.indexOf(Equipment.getClassType(item)) != -1) {
-			if(!team.weapon.name.equals("None")) World.inv.addItem(team.weapon.name);
+			if(!team.weapon.name.equals("None")) BaseWorld.inv.addItem(team.weapon.name);
 			team.weapon = new Equipment(item, true);
-			World.inv.removeItem(team.weapon.name);
+			BaseWorld.inv.removeItem(team.weapon.name);
 		}
 		else if(Arrays.asList(clothes).indexOf(item) != -1 && team.className.indexOf(Equipment.getClassType(item)) != -1){
-			if(!team.clothes.name.equals("None")) World.inv.addItem(team.clothes.name);
+			if(!team.clothes.name.equals("None")) BaseWorld.inv.addItem(team.clothes.name);
 			team.clothes = new Equipment(item, false);
-			World.inv.removeItem(team.clothes.name);
+			BaseWorld.inv.removeItem(team.clothes.name);
 		}
 		
 	}
