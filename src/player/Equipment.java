@@ -9,7 +9,6 @@ public class Equipment implements Serializable{
 	public int attack;
 	public int spellPower;
 	public int defense;
-	public int value;
 	public boolean weapon;
 	public String classType;
 	
@@ -24,35 +23,30 @@ public class Equipment implements Serializable{
 			if(name.equals("Wood Staff")) {
 				attack = 1;
 				spellPower = 3;
-				value = 50;
 				classType = "Mage";
 			}
 			//Warrior
 			else if(name.equals("Wood Sword")) {
 				attack = 4;
 				spellPower = 0;
-				value = 50;
 				classType = "Warrior";
 			}
 			//Spearman
 			else if(name.equals("Wood Spear")) {
 				attack = 4;
 				spellPower = 0;
-				value = 50;
 				classType = "Spearman";
 			}
 			//Archer
 			else if(name.equals("Wood Bow")) {
 				attack = 3;
 				spellPower = 0;
-				value = 50;
 				classType = "Archer";
 			}
 			else {
 				this.name = "None";
 				attack = 0;
 				spellPower = 0;
-				value = 0;
 				classType = "Any";
 			}
 		}
@@ -64,38 +58,32 @@ public class Equipment implements Serializable{
 			//Mage
 			if(name.equals("Cloth Cloak")) {
 				defense = 2;
-				value = 50;
 				classType = "Mage";
 			}
 			//Warrior
 			else if(name.equals("Cloth Suit")) {
 				defense = 5;
-				value = 50;
 				classType = "Warrior";
 			}
 			//Spearman
 			else if(name.equals("Cloth Armor")) {
 				defense = 4;
-				value = 50;
 				classType = "Spearman";
 			}
 			//Archer
 			else if(name.equals("Cloth Vest")) {
 				defense = 3;
-				value = 50;
 				classType = "Archer";
 			}
 			//Monk
 			else if(name.equals("Cloth Robe")) {
 				defense = 3;
-				value = 50;
 				classType = "Monk";
 			}
 			
 			else {
 				this.name = "None";
 				defense = 0;
-				value = 0;
 				classType = "Any";
 			}
 		}
@@ -113,6 +101,19 @@ public class Equipment implements Serializable{
 		else return "";
 	}
 	
+	public static int getAttack(String weapon) {
+		Equipment e = new Equipment(weapon, true);
+		return e.attack;
+	}
 	
+	public static int getSpellPower(String weapon) {
+		Equipment e = new Equipment(weapon, true);
+		return e.spellPower;
+	}
+
+	public static int getDefense(String armor) {
+		Equipment e = new Equipment(armor, false);
+		return e.defense;
+	}
 
 }

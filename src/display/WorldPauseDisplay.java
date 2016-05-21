@@ -45,8 +45,8 @@ public class WorldPauseDisplay {
 	Image black = new ImageIcon("Sprites/BlackBar.png").getImage();
 	Image health;
 	Image warriorPortrait = loader.loadImage("/Warrior_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
-	Image blackmagePortrait = loader.loadImage("/Blackmage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
-	Image whitemagePortrait = loader.loadImage("/Whitemage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
+	Image blackmagePortrait = loader.loadImage("/BlackMage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
+	Image whitemagePortrait = loader.loadImage("/WhiteMage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
 	Image archerPortrait = loader.loadImage("/Archer_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
 	Image spearmanPortrait = loader.loadImage("/Spearman_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
 	Image monkPortrait = loader.loadImage("/Monk_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
@@ -130,11 +130,11 @@ public class WorldPauseDisplay {
 			
 			if(invMenu || invCharMenu) {
 				
-				invList = world.inv.getItems();
-				invAmts = world.inv.getItemAmounts();
+				invList = World.inv.getItems();
+				invAmts = World.inv.getItemAmounts();
 				g.setColor(Color.WHITE);
 				g.setFont(new Font("pixelmix", Font.PLAIN, ht / 45));
-				for(int i = 0; i < world.inv.size(); i++) {
+				for(int i = 0; i < World.inv.size(); i++) {
 					if(Item.usable(invList[i])) g.setColor(Color.WHITE);
 					else g.setColor(Color.GRAY);
 					g.drawString(invList[i] + " x " + invAmts[i], wd * 6 / 7, (5 * border) * (i + 1));
@@ -180,6 +180,10 @@ public class WorldPauseDisplay {
 							g.drawString(World.quests.elementAt(pauseSelect).mobs[i] + ": " + World.quests.elementAt(pauseSelect).tracker[i] + 
 									" / " + World.quests.elementAt(pauseSelect).target[i], wd * 5 / 6, ht - border * 17 + (border * i * 2));
 					}
+					else if(questType.equals("class player.CollectQuest")) 
+						for(int i = 0; i < World.quests.elementAt(pauseSelect).items.length; i++)
+							g.drawString(World.quests.elementAt(pauseSelect).items[i] + ": " + World.inv.checkItem(World.quests.elementAt(pauseSelect).items[i]) + 
+									" / " + World.quests.elementAt(pauseSelect).target[i], wd * 5 / 6, ht - border * 17 + (border * i * 2));
 				}
 			}
 			
@@ -187,7 +191,11 @@ public class WorldPauseDisplay {
 				
 				g.setColor(Color.WHITE);
 				g.setFont(new Font("pixelmix", Font.PLAIN, ht / 45));
-				for(int i = 0; i < pauseOptions.length; i++) g.drawString(pauseOptions[i], wd * 6 / 7, (5 * border) * (i + 1));
+				for(int i = 0; i < pauseOptions.length - 2; i++) g.drawString(pauseOptions[i], wd * 6 / 7, (5 * border) * (i + 1));
+				if(!world.worldMap) g.setColor(Color.GRAY);
+				g.drawString(pauseOptions[pauseOptions.length-2], wd * 6 / 7, (5 * border) * (pauseOptions.length-1));
+				g.setColor(Color.WHITE);
+				g.drawString(pauseOptions[pauseOptions.length-1], wd * 6 / 7, (5 * border) * (pauseOptions.length));
 				g.drawImage(sideArrow, wd * 6 / 7 - 5 * border, (5 * border) * (pauseSelect + 1) - border * 3 / 2, null);
 				g.drawString("Money: " + currency, wd * 6 / 7 - border * 3, 60 * border);
 				
@@ -254,8 +262,8 @@ public class WorldPauseDisplay {
 					else charSelect++;
 				}
 				else if(k == KeyEvent.VK_ENTER) {
-					itemSound.play();
-					Item.use(team[charSelect], item);
+					if(Item.use(team[charSelect], item)) itemSound.play();
+					else menuBackSound.play();
 					charSelect = 0;
 					invSelect = 0;
 					invMenu = true;
@@ -284,7 +292,6 @@ public class WorldPauseDisplay {
 					memberSelected = team[charSelect];
 					abilityList = memberSelected.spells;
 					abilityList.trimToSize();
-					for(int i = 0; i < abilityList.size(); i++) System.out.println(abilityList.get(i).name);
 					charSelect = 0;
 				}
 				else if(k == KeyEvent.VK_ESCAPE) {
@@ -329,7 +336,8 @@ public class WorldPauseDisplay {
 				}
 				else if(k == KeyEvent.VK_ENTER) {
 					itemSound.play();
-					ability.useMenuSpell(memberSelected, team[charSelect]);
+					if(ability.useMenuSpell(memberSelected, team[charSelect])) itemSound.play();
+					else menuBackSound.play();
 					charSelect = 0;
 					abilityMenu = true;
 					abilityCharMenu = false;
@@ -386,10 +394,13 @@ public class WorldPauseDisplay {
 						questMenu = true;
 					}
 					else if(pauseSelect == 4) {
-						saveSound.play();
-						saver.save(world.team, world.player, world.inv, world.quests);
-						saved = true;
-						saveTick = 120;
+						if(world.worldMap){
+							saveSound.play();
+							saver.save(World.team, World.player, World.inv, World.quests);
+							saved = true;
+							saveTick = 120;
+						}
+						else menuBackSound.play();
 					}
 					else if(pauseSelect == 5) {
 						menuSelectSound.play();
@@ -404,8 +415,8 @@ public class WorldPauseDisplay {
 		menuSelectSound.play();
 		pauseSelect = 0;
 		paused = true;
-		team = world.team;
-		currency = world.inv.getCurrency();
+		team = World.team;
+		currency = World.inv.getCurrency();
 	}
 	
 	public void unpause() {

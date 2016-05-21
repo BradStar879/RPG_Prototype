@@ -15,6 +15,7 @@ Image blockType = new ImageIcon("Sprites/Gravel.png").getImage();
 		this.wd = wd;
 		walkable = true;
 		enter = false;
+		name = "Gravel";
 	}
 	
 	public void draw(Graphics g) {

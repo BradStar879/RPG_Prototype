@@ -89,9 +89,9 @@ public class BaseMob {
 	public void draw(Graphics g) {
 		if(alive) {
 			g.setColor(Color.BLACK);
-			g.drawRect(x - barWd / 2, y - gmHt / 7, barWd, barWd / 5);
+			g.drawRect(x - barWd / 2, y - gmHt / 6, barWd, barWd / 5);
 			g.setColor(Color.BLUE);
-			g.fillRect(x - barWd / 2, y - gmHt / 7, barWd * hp / maxHp, barWd / 5);
+			g.fillRect(x - barWd / 2, y - gmHt / 6, barWd * hp / maxHp, barWd / 5);
 			g.drawImage(sprite, x - gmHt / 18, y - gmHt / 7, null);
 		}
 	}
@@ -131,6 +131,18 @@ public class BaseMob {
 	
 	public void startAttackLane() {
 		battle.startAttackLane(lane);
+	}
+	
+	public void startSmartAttack() {
+		attackPos = 3 * ((int)(Math.random() * 3)) + lane;
+		for(int i = 0; i < 3; i++) {
+			if(battle.checkPos(attackPos)) {
+				battle.startAttackChar(attackPos);
+				return;
+			}
+			else attackPos = (attackPos + 3) % 9;
+		}
+		battle.startAttackChar(attackPos);
 	}
 	
 	public void attack() {

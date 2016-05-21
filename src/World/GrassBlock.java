@@ -14,6 +14,7 @@ public class GrassBlock extends BaseWorldBlock{
 		this.wd = wd;
 		walkable = true;
 		enter = false;
+		name = "Grass";
 	}
 	
 	public void draw(Graphics g) {

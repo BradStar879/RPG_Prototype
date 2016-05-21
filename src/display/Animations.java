@@ -4,14 +4,42 @@ import game.main.GamePanel;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
 
 public class Animations {
 	
 	public static int delay = 0;
 	static int wd = GamePanel.WIDTH;
 	static int ht = GamePanel.HEIGHT;
+	Image[] arr;
+	int arrLen;
+	int aniCount;
+	int curImg;
+	int x, y;
 
 	public Animations() {}
+	
+	public void setAnimate(Image[] arr, int x, int y) {
+		this.arr = arr;
+		arrLen = arr.length;
+		aniCount = 0;
+		curImg = 0;
+		this.x = x;
+		this.y = y;
+	}
+	
+	public boolean animate(Graphics g) {
+		g.drawImage(arr[curImg], x, y, null);
+		if(aniCount == 1) {
+			curImg++;
+			aniCount = 0;
+			if(curImg == arrLen) return false;
+		}
+		else aniCount++;
+		return true;
+	}
 	
 	public static boolean splitScreenVert(Graphics g, int delayMax) {
 

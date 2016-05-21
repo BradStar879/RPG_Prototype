@@ -14,6 +14,7 @@ public class WaterBlock extends BaseWorldBlock{
 		this.wd = wd;
 		walkable = false;
 		enter = false;
+		name = "Water";
 	}
 	
 	public void draw(Graphics g) {

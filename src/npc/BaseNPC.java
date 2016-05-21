@@ -34,7 +34,12 @@ public class BaseNPC {
 	int[] walkPath;
 	public boolean talking;
 	boolean walking;
+	public boolean selling;
 	BaseWorld world;
+	String[][] questMobs;
+	int[][] questMobAmts;
+	String[][] questItems;
+	int[][] questItmAmts;
 	
 	public BaseNPC(int x, int y, int edgeX, int edgeY, int blockSize, BaseWorld world, int stage) {
 		this.x = x;
@@ -55,6 +60,7 @@ public class BaseNPC {
 		drawY2 = 0;
 		talking = false;
 		walking = false;
+		selling = false;
 		walkCount = (int)(Math.random() * 120);
 		textBox = new ImageIcon("Sprites/DialogueBox.png").getImage();
 	}
@@ -148,6 +154,8 @@ public class BaseNPC {
 		else if(d == 2) drawY2 -= blockSize / 14;
 		else drawX2 += blockSize / 14;
 	}
+	
+	public void keyPressed(int k) {};
 	
 	public void reset() {
 		drawX2 = 0;

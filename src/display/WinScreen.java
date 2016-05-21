@@ -26,8 +26,8 @@ public class WinScreen{
 	Image purple = new ImageIcon("Sprites/PurpleInfoBar.png").getImage();
 	Image black = new ImageIcon("Sprites/BlackBar.png").getImage();
 	Image warriorPortrait = loader.loadImage("/Warrior_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
-	Image blackmagePortrait = loader.loadImage("/Blackmage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
-	Image whitemagePortrait = loader.loadImage("/Whitemage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
+	Image blackmagePortrait = loader.loadImage("/BlackMage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
+	Image whitemagePortrait = loader.loadImage("/WhiteMage_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
 	Image archerPortrait = loader.loadImage("/Archer_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
 	Image spearmanPortrait = loader.loadImage("/Spearman_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);
 	Image monkPortrait = loader.loadImage("/Monk_portrait.png").getScaledInstance(ht / 5, ht / 5, Image.SCALE_SMOOTH);

@@ -14,6 +14,7 @@ public class SandBlock extends BaseWorldBlock{
 		this.wd = wd;
 		walkable = true;
 		enter = false;
+		name = "Sand";
 	}
 	
 	public void draw(Graphics g) {

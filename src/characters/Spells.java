@@ -145,11 +145,15 @@ public class Spells implements Serializable{
 		
 	}
 	
-	public void useMenuSpell(CharacterStats caster, CharacterStats target) {
-		if(name.equals("Heal")) target.hp += caster.spellPower;
-		else if(name.equals("Mega Heal")) target.hp += caster.spellPower * 2;
-		if(target.hp > target.maxHp) target.hp = target.maxHp;
+	public boolean useMenuSpell(CharacterStats caster, CharacterStats target) {
+		if(name.equals("Heal") || name.equals("Mega Heal")) {
+			if(target.hp > target.maxHp) return false;
+			if(name.equals("Heal")) target.hp += caster.spellPower;
+			else if(name.equals("Mega Heal")) target.hp += caster.spellPower * 2;
+			if(target.hp > target.maxHp) target.hp = target.maxHp;
+		}
 		caster.mp -= mpCost;
+		return true;
 	}
 	
 }

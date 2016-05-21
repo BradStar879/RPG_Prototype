@@ -9,6 +9,8 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
+
 import physics.Sounds;
 import display.BufferedImageLoader;
 
@@ -22,10 +24,12 @@ public class BaseCharacter {
 	boolean attacking;
 	boolean queued;
 	boolean alive;
+	boolean dead2;
 	int wd;
 	int ht;
 	int gmWd;
 	int gmHt;
+	int border;
 	
 	public String name;
 	public int hp;
@@ -79,6 +83,7 @@ public class BaseCharacter {
 	BaseLevel battle;
 	
 	Sounds damageSound = new Sounds("Sounds/playerattacked.wav");
+	Image crossbones = new ImageIcon("Sprites/Crossbones.png").getImage();
 	
 	public BaseCharacter(int num, int pos, BaseLevel battle, String name, int level, int hp, int maxHp, int mp,
 			int maxMp, int speed, int attack, int armor, int spellPower, Vector<Spells> spells) {
@@ -89,6 +94,8 @@ public class BaseCharacter {
 		this.level = level;
 		this.hp = hp;
 		this.maxHp = maxHp;
+		if(this.hp > 0) this.alive = true;
+		else this.alive = false;
 		this.mp = mp;
 		this.maxMp = maxMp;
 		this.speed = speed;
@@ -101,7 +108,6 @@ public class BaseCharacter {
 	}
 	
 	public void init() {
-		alive = true;
 		selected = false;
 		attacking = false;
 		queued = false;
@@ -109,6 +115,8 @@ public class BaseCharacter {
 		gmHt = GamePanel.HEIGHT;
 		wd = GamePanel.HEIGHT / 24;
 		ht = GamePanel.HEIGHT / 12;
+		border = gmHt / 62;
+		dead2 = false;
 		time = (int)(Math.random() * 301 + 0);
 		timeMax = 60000;
 		rowCoord0 = gmHt * 7 / 16;
@@ -153,12 +161,6 @@ public class BaseCharacter {
 	}
 	
 	public void tick() {
-		
-		if(hp <= 0) {
-			alive = false;
-			attacking = false;
-		}
-		else alive = true;
 		
 		if(alive) {
 			if(num == battle.getCharSelected()) {
@@ -290,14 +292,44 @@ public class BaseCharacter {
 			}
 		}
 		
-		if(distance == 0) g.drawImage(sprite, x - gmHt / 36, y - gmHt / 24, null);
-		else if(distance == 1) g.drawImage(sprite, x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5, null);
-		else g.drawImage(sprite, x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4, null);
+		if(distance == 0) {
+			if(alive) g.drawImage(sprite, x - gmHt / 36, y - gmHt / 24, null);
+			else if(!dead2) {
+				g.drawImage(sprite, x - gmHt / 7, y - gmHt / 24, null);
+				g.drawImage(crossbones, x - gmHt / 8, y, gmHt / 16, gmHt / 16, null);
+			}
+			else {
+				g.drawImage(sprite, x + gmHt / 14, y - gmHt / 24, null);
+				g.drawImage(crossbones, x + gmHt / 11, y, gmHt / 16, gmHt / 16, null);
+			}
+		}
+		else if(distance == 1) {
+			if(alive) g.drawImage(sprite, x - gmHt / 26, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5, null);
+			else if(!dead2) {
+				g.drawImage(sprite, x - gmHt / 6, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5, null);
+				g.drawImage(crossbones, x - gmHt / 6 + border, y - gmHt / 24, gmHt / 12, gmHt / 12, null);
+			}
+			else {
+				g.drawImage(sprite, x + gmHt / 12, y - gmHt / 12, (int)(gmHt / 7.5), gmHt / 5, null);
+				g.drawImage(crossbones, x + gmHt / 10, y - gmHt / 24, gmHt / 12, gmHt / 12, null);
+			}
+		}
+		else {
+			if(alive) g.drawImage(sprite, x - gmHt / 19, y - gmHt / 10, gmHt / 6, gmHt / 4, null);
+			else if(!dead2) {
+				g.drawImage(sprite, x - gmHt / 5, y - gmHt / 10, gmHt / 6, gmHt / 4, null);
+				g.drawImage(crossbones, x - gmHt / 5 + border * 3 / 2, y - gmHt / 24, gmHt / 10, gmHt / 10, null);
+			}
+			else {
+				g.drawImage(sprite, x + gmHt / 10, y - gmHt / 10, gmHt / 6, gmHt / 4, null);
+				g.drawImage(crossbones, x + gmHt / 9 + border, y - gmHt / 24, gmHt / 10, gmHt / 10	, null);
+			}
+		}
 		
 		if(attacking) {
-			if(distance == 0) g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 12 - (arrowFloat / 2), gmHt / 48, gmHt / 24, null);
-			else if(distance == 1) g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 7 - (arrowFloat * 3 / 4), null);
-			else g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 6 - arrowFloat, gmHt / 28, gmHt / 14, null);
+			if(distance == 0) battle.arrowSet(x + wd / 2 - gmHt / 72, y - gmHt / 12 - (arrowFloat / 2), gmHt / 48, gmHt / 24); //    (g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 12 - (arrowFloat / 2), gmHt / 48, gmHt / 24, null);
+			else if(distance == 1) battle.arrowSet(x + wd / 2 - gmHt / 72, y - gmHt / 7 - (arrowFloat * 3 / 4), gmHt / 36, gmHt / 18);  //g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 7 - (arrowFloat * 3 / 4), null);
+			else battle.arrowSet(x + wd / 2 - gmHt / 72, y - gmHt / 6 - arrowFloat, gmHt / 28, gmHt / 14);  //g.drawImage(arrow, x + wd / 2 - gmHt / 72, y - gmHt / 6 - arrowFloat, gmHt / 28, gmHt / 14, null);
 		}
 		
 	}
@@ -375,10 +407,6 @@ public class BaseCharacter {
 	}
 	
 	public void keyReleased(int k) {
-		
-	}
-	
-	public void getPortrait() {
 		
 	}
 	
@@ -463,14 +491,28 @@ public class BaseCharacter {
 	}
 	
 	public void takeDamage(int damage) {
-		if(armor >= damage) {
-			hp -= 1;
+		if(hp != 0) {
+			if(armor >= damage) {
+				hp -= 1;
+			}
+			else hp -= damage - armor;
+			if(hp <= 0) {
+				if(!battle.checkDeadPos(pos)) {
+					battle.changePos(pos, false);
+					battle.changeDeadPos(pos, true);
+				}
+				else {
+					dead2 = true;
+					battle.changePos(pos, false);
+					battle.changeDead2Pos(pos, true);
+				}
+				alive = false;
+				attacking = false;
+				regenCount = 0;
+				hp = 0;
+			}
+			damageSound.play();
 		}
-		else hp -= damage - armor;
-		if(hp <= 0) {
-			hp = 0;
-		}
-		damageSound.play();
 	}
 	
 	public void heal(int amount) {
@@ -485,8 +527,27 @@ public class BaseCharacter {
 		regenCount = duration;
 	}
 	
+	public void resurrect(int amount) {
+		if(!dead2) {
+			battle.changeDeadPos(pos, false);
+			battle.changePos(pos, true);
+		}
+		else {
+			battle.changeDead2Pos(pos, false);
+			battle.changePos(pos, true);
+			dead2 = false;
+		}
+		alive = true;
+		hp += amount;
+		if(hp > maxHp) hp = maxHp;
+	}
+	
 	public boolean getAlive() {
 		return alive;
+	}
+	
+	public boolean getDead2() {
+		return dead2;
 	}
 	
 	public String[] getMovesOnCooldown() {

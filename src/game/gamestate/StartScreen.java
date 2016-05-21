@@ -3,7 +3,12 @@ package game.gamestate;
 import game.main.GamePanel;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.IOException;
 
 public class StartScreen extends GameState{
 	
@@ -16,7 +21,13 @@ public class StartScreen extends GameState{
 	
 	public void init() {
 		count = 0;
-		
+		try {
+		     GraphicsEnvironment ge = 
+		         GraphicsEnvironment.getLocalGraphicsEnvironment();
+		     ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("pixelmix.ttf")));
+		} catch (IOException|FontFormatException e) {
+		     //Handle exception
+		}
 	}
 
 	

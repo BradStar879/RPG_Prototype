@@ -45,13 +45,13 @@ public class MenuState extends GameState{
 		options = new String[]{"New Game", "Load Game", "Help", "Quit"};
 		currentSelection = 0;
 		menuScreen = new ImageIcon("Sprites/MenuScreen.png").getImage();
-		try {
+		/*try {
 		     GraphicsEnvironment ge = 
 		         GraphicsEnvironment.getLocalGraphicsEnvironment();
 		     ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("pixelmix.ttf")));
 		} catch (IOException|FontFormatException e) {
 		     //Handle exception
-		}
+		}*/
 	}
 
 	public void tick() {

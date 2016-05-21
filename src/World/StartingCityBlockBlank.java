@@ -8,6 +8,7 @@ public class StartingCityBlockBlank extends BaseWorldBlock{
 		this.wd = wd;
 		walkable = true;
 		enter = true;
+		name = "Starting City Block";
 	}
 	
 	public void draw(Graphics g) {}

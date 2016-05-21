@@ -8,6 +8,7 @@ public class Quests implements Serializable{
 	public String questName;;
 	public boolean finished;
 	public String[] mobs;
+	public String[] items;
 	public int[] target;
 	public int[] tracker;
 	

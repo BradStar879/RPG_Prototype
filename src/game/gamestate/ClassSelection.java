@@ -44,14 +44,14 @@ public class ClassSelection extends GameState{
 	Image arrow = loader.loadImage("/SideArrow.png").getScaledInstance(wd / 20, wd / 40, Image.SCALE_SMOOTH);
 	Image rDisplay = new ImageIcon("Sprites/PauseBox.png").getImage();
 	Image warriorPortrait = loader.loadImage("/Warrior_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
-	Image blackmagePortrait = loader.loadImage("/Blackmage_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
-	Image whitemagePortrait = loader.loadImage("/Whitemage_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
+	Image blackmagePortrait = loader.loadImage("/BlackMage_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
+	Image whitemagePortrait = loader.loadImage("/WhiteMage_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
 	Image archerPortrait = loader.loadImage("/Archer_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
 	Image spearmanPortrait = loader.loadImage("/Spearman_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
 	Image monkPortrait = loader.loadImage("/Monk_portrait.png").getScaledInstance(wd / 14, wd / 14, Image.SCALE_SMOOTH);
 	Image warriorPortraitBig = loader.loadImage("/Warrior_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
-	Image blackmagePortraitBig = loader.loadImage("/Blackmage_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
-	Image whitemagePortraitBig = loader.loadImage("/Whitemage_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
+	Image blackmagePortraitBig = loader.loadImage("/BlackMage_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
+	Image whitemagePortraitBig = loader.loadImage("/WhiteMage_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
 	Image archerPortraitBig = loader.loadImage("/Archer_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
 	Image spearmanPortraitBig = loader.loadImage("/Spearman_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
 	Image monkPortraitBig = loader.loadImage("/Monk_portrait.png").getScaledInstance(wd / 9, wd / 9, Image.SCALE_SMOOTH);
@@ -185,7 +185,7 @@ public class ClassSelection extends GameState{
 					char3 = new CharacterStats(names[2], classesSelected[2]);
 					team = new CharacterStats[]{char1, char2, char3};
 					World world = new World(gsm);
-					world.team = this.team;
+					World.team = this.team;
 					gsm.states.pop();
 					gsm.states.push(world);
 				}

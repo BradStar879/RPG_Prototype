@@ -62,16 +62,19 @@ public class BaseLevel extends GameState{
 	
 	boolean[] mobInLane;
 	boolean[] posFilled;
+	boolean[] deadPosFilled;
+	boolean[] dead2PosFilled;
 	public BaseMob[] mob;
 	boolean experienceRewarded;
 	
 	BufferedImageLoader loader;
 	Image menuBox = new ImageIcon("Sprites/MenuBox.png").getImage();
 	Image sideArrow = loader.loadImage("/SideArrow.png").getScaledInstance(ht / 40, border, Image.SCALE_SMOOTH);
+	Image arrow = loader.loadImage("/Arrow.png").getScaledInstance(ht / 36, ht / 18, Image.SCALE_SMOOTH);
 	Image background;
 	Sounds bgm;
-	Sounds vicTheme;
-	
+	Sounds vicTheme = new Sounds("Music/victorytheme.wav");
+	Sounds defTheme = new Sounds("Music/defeattheme.wav");
 	
 	public CoordinateTester test;
 	public BaseCharacter[] chars;
@@ -83,6 +86,12 @@ public class BaseLevel extends GameState{
 	public WinScreen wScreen;
 	public LossScreen lScreen;
 	public static Grid grid;
+	
+	boolean arrDraw;
+	int arrX;
+	int arrY;
+	int arrWd;
+	int arrHt;
 	
 	int numItemsWon;
 	int itemsWonChance;
@@ -118,14 +127,6 @@ public class BaseLevel extends GameState{
 		experienceRewarded = false;
 		battleEnd = 600;
 		loader = new BufferedImageLoader();
-		vicTheme = new Sounds("Music/victorytheme.wav");
-		
-		mobInLane = new boolean[3];
-		for(int i = 0; i < 3; i++) mobInLane[i] = true;
-		
-		posFilled = new boolean[9];
-		for(int i = 0; i < 9; i++) posFilled[i] = false;
-		for(int i = 3; i < 6; i++) posFilled[i] = true;
 		
 		CharacterStats[] team = new CharacterStats[3];
 		chars = new BaseCharacter[3];
@@ -151,6 +152,22 @@ public class BaseLevel extends GameState{
 			else if(team[i].className.equals("Monk")) chars[i] = new Monk(i, i + 3, this, team[i].name, team[i].level, team[i].hp,
 				team[i].maxHp, team[i].mp, team[i].maxMp, team[i].speed, team[i].attack + team[i].weapon.attack, team[i].armor + 
 				team[i].clothes.defense, team[i].spellPower + team[i].weapon.spellPower, team[i].spells);
+		}
+		
+		mobInLane = new boolean[3];
+		for(int i = 0; i < 3; i++) mobInLane[i] = true;
+		
+		posFilled = new boolean[9];
+		deadPosFilled = new boolean[9];
+		dead2PosFilled = new boolean[9];
+		for(int i = 0; i < 9; i++) {
+			posFilled[i] = false;
+			deadPosFilled[i] = false;
+			dead2PosFilled[i] = false;
+		}
+		for(int i = 3; i < 6; i++) {
+			if(chars[i-3].getAlive()) posFilled[i] = true;
+			else deadPosFilled[i] = true;
 		}
 			
 		topInfo = new InfoDisplay(chars[0], 0, this);
@@ -190,6 +207,7 @@ public class BaseLevel extends GameState{
 		}
 		if(!chars[0].getAlive() && !chars[1].getAlive() && !chars[2].getAlive() && !lost) {
 			bgm.stop();
+			defTheme.play();
 			lost = true;
 		}
 		if(!won && !lost && !paused) {
@@ -205,7 +223,10 @@ public class BaseLevel extends GameState{
 					turnActive = true;
 					attackQueue.peek().attackMode();
 				}
-				else dequeueTurn();
+				else {
+					changeMenuSelect("RIGHT");
+					dequeueTurn();
+				}
 			}
 		}
 		if(won) {
@@ -259,6 +280,7 @@ public class BaseLevel extends GameState{
 		//test.draw(g);
 		for(int i = 0; i < 3; i++) mob[i].draw(g);
 		for(int i = 0; i < 3; i++) chars[i].draw(g);
+		arrowDraw(g);
 		
 		if(won) {
 			wScreen.draw(g);
@@ -301,19 +323,51 @@ public class BaseLevel extends GameState{
 		return posFilled[p];
 	}
 	
+	public boolean checkDeadPos(int p) {
+		return deadPosFilled[p];
+	}
+	
+	public boolean checkDead2Pos(int p) {
+		return dead2PosFilled[p];
+	}
+	
 	public void changePos(int p, boolean b) {
 		posFilled[p] = b;
 	}
 	
+	public void changeDeadPos(int p, boolean b) {
+		deadPosFilled[p] = b;
+	}
+	
+	public void changeDead2Pos(int p, boolean b) {
+		dead2PosFilled[p] = b;
+	}
+	
 	public BaseCharacter getCharAt(int pos) {
-		for(int i = 0; i < 3; i++) if(chars[i].getPos() == pos) return chars[i];
+		for(int i = 0; i < 3; i++) {
+			if(chars[i].getPos() == pos && chars[i].getAlive()) return chars[i];
+		}
+		return null;
+	}
+	
+	public BaseCharacter getDeadCharAt(int pos) {
+		for(int i = 0; i < 3; i++) {
+			if(chars[i].getPos() == pos && !chars[i].getAlive() && !chars[i].getDead2()) return chars[i];
+		}
+		return null;
+	}
+	
+	public BaseCharacter getDead2CharAt(int pos) {
+		for(int i = 0; i < 3; i++) {
+			if(chars[i].getPos() == pos && !chars[i].getAlive() && chars[i].getDead2()) return chars[i];
+		}
 		return null;
 	}
 	
 	public void charSelectForward() {
 		if(charSelect == 2) charSelect = 0;
 		else charSelect++;
-		while(!chars[charSelect].getAlive()) {
+		while(!chars[charSelect].getAlive() && (chars[0].getAlive() || chars[1].getAlive() || chars[2].getAlive())) {
 			if(charSelect == 2) charSelect = 0;
 			else charSelect++;
 		}
@@ -405,7 +459,11 @@ public class BaseLevel extends GameState{
 				else menuSelect++;
 			}
 		}
-		else if(s.equals("LEFT") || s.equals("RIGHT")) menuSelect = 0;
+		else if(s.equals("LEFT")) menuSelect = 0;
+		else if(s.equals("RIGHT")) {
+			menuSelect = 0;
+			arrDraw = false;
+		}
 	}
 	
 	public void changeMenuOptions(String option, String option2, String option3, String option4, 
@@ -431,6 +489,18 @@ public class BaseLevel extends GameState{
 	public void unpause() {
 		bgm.resume();
 		paused = false;
+	}
+	
+	public void arrowDraw(Graphics g) {
+		if(arrDraw) g.drawImage(arrow, arrX, arrY, arrWd, arrHt, null);
+	}
+	
+	public void arrowSet(int x, int y, int wd, int ht) {
+		arrX = x;
+		arrY = y;
+		arrWd = wd;
+		arrHt = ht;
+		arrDraw = true;
 	}
 	
 	public void exit() {

@@ -16,6 +16,7 @@ public class BaseWorldBlock {
 	public int x;
 	public int y;
 	Image blockType;
+	public String name;
 	
 	public BaseWorldBlock() {}
 
